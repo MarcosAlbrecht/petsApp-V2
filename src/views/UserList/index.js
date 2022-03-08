@@ -13,8 +13,7 @@ export default props => {
     const [postAdocao, setPostAdocao] = useState();
     
     useEffect(() => {
-        api
-          .get("postadocao")
+        api.get("postadocao")
           .then((response) => setPostAdocao(response.data))
           .catch((err) => {
             console.error("ops! ocorreu um erro" + err);

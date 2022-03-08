@@ -11,7 +11,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import IconFeather from 'react-native-vector-icons/Feather';
 import Authenticate from './views/Authenticate/'
-
+import adocaoPetCadastro from './views/adocaoPetCadastro';
 //const Stack = createStackNavigator();
 const StackAdocao = createStackNavigator();
 
@@ -30,7 +30,7 @@ function AdocaoTabStack(){
                     title:"Adocão",
                     headerRight: () => (
                         <Button
-                            onPress={() => navigation.navigate("Authenticate")} 
+                            onPress={() => navigation.navigate("adocaoPetCadastro")} 
                             type='clear'
                             icon={<Icon name="add" size={25} color="white"/>}
                         />
@@ -39,12 +39,26 @@ function AdocaoTabStack(){
             }} 
             />
             <StackAdocao.Screen 
-                        name='Authenticate'
-                        component={Authenticate}
-                        options={{
-                            title: "Login"
-                        }}
-                    />
+                name='PostAdocaoDetalhado'
+                component={PostAdocaoDetalhado}
+                options={{
+                    title: "Detalhes"
+                }}
+            />
+            <StackAdocao.Screen 
+                name='Authenticate'
+                component={Authenticate}
+                options={{
+                    title: "Login"
+                }}
+            />
+            <StackAdocao.Screen 
+                name='adocaoPetCadastro'
+                component={adocaoPetCadastro}
+                options={{
+                    title: "Cadastro Post"
+                }}
+            />
 
             
         </StackAdocao.Navigator>
