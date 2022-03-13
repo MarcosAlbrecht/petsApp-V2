@@ -2,16 +2,22 @@ import React from 'react';
 import { StyleSheet } from 'react-native';
 
 const estilos = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#ffffff',
+    container: {       
         margin: 30,
         alignItems: "center",
         justifyContent: "center",
+        backgroundColor : '#fff',
+        flex: 1,
       },
-     
-      image: {
-        
+      card: {
+        flex: 1,
+        marginHorizontal: 10,
+        marginTop: 10,
+        backgroundColor: '#4F4F4F',
+        marginBottom: 10,
+        paddingBottom: 10,
+      },
+      image: {     
         height: 130,
         alignSelf: 'center', 
         resizeMode: 'contain',
@@ -49,6 +55,50 @@ const estilos = StyleSheet.create({
         marginTop: 20,
         backgroundColor: "#FF1493",
       },
+      textGeral: {
+        alignItems: 'flex-start',
+        fontSize: 18,
+        color: '#fff',
+        fontWeight: '400',
+        paddingHorizontal: 10,
+        paddingTop: 10,
+      },
+      textInput: {
+        backgroundColor: '#ffff',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        fontSize: 15,
+        marginHorizontal: 10,
+        paddingVertical: 3,
+      }, 
+      textInputDescricao: {
+        backgroundColor: '#ffff',
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        fontSize: 15,
+        marginHorizontal: 10,
+        paddingVertical: 3,
+        height: 150,
+      },      
+      btnCard: {      
+        flexDirection: 'row',  
+        marginTop: 20,
+      },
+      btnSalvar: {
+        flex: 1,
+        marginHorizontal: 10,
+        borderRadius: 75,
+        width: '40%',
+        backgroundColor: '#f4511e',
+        
+      },
+      cardBtnText: {
+        color: '#fff',
+        marginHorizontal: 25,
+        marginVertical: 10,      
+        textAlign: 'center',
+        fontSize: 15,
+      }
 })
 
 export default estilos;

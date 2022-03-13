@@ -5,7 +5,7 @@ import UserList from './views/UserList/index';
 import UserForm from './views/UserForm/UserForm';
 import PostAdocaoDetalhado from './views/PostAdocaoDetalhado/index'
 import { Button, Icon } from 'react-native-elements';
-import { UsersProvider } from './context/UsersContext';
+import { UsersProvider } from './context/StateContext';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

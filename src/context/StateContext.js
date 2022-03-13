@@ -1,7 +1,8 @@
-import React, {createContext, useReducer} from 'react';
+import React, {createContext, useEffect, useReducer, useState} from 'react';
 import users from '../data/users';
+import api from '../services/api';
 
-const initialState = { users }
+const initialState = {users}
 const UsersContext = createContext({})
 
 const actions = {
@@ -31,16 +32,36 @@ const actions = {
 }
 
 export const UsersProvider = props => {
-
+    const [postAdocao, setPostAdocao] = useState([]);
     
-
+    
+    
+    console.warn('valores do initialState', initialState)
+    //console.warn('valores do postadocao', postAdocao)
     function reducer(state, action){
-        console.warn(action)
+        console.warn('action',action)
         const fn = actions[action.type]
         return fn ? fn(state, action) : state
     }
 
     const [state, dispatch] = useReducer(reducer, initialState)
+
+    useEffect(() => {
+        api.get("postadocao")       
+          .then((response) => {dispatch(
+              {
+                type: 'INITIALIZE_POSTADOCAO',
+                payload:{
+                    ...initialState,
+                    postAdocao: response?.data,
+                    
+                }  
+              }, console.warn(response.data),)})
+          .catch((err) => {
+            console.error("ops! ocorreu um erro" + err);
+            console.log('items',response.data)
+          });
+      }, []);
 
     return(
         <UsersContext.Provider value={{state, dispatch}} >

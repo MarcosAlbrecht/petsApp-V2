@@ -2,16 +2,19 @@ import { getActionFromState } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
 import { View, Text, FlatList, Alert, TouchableOpacity, Image } from 'react-native';
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements';
-import UsersContext from '../../context/UsersContext';
-import users from '../../data/users';
+import UsersContext from '../../context/StateContext';
 import api from '../../services/api';
 import style from './styles'
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import containerPadrao from '../../styles';
 
 export default props => {
-    console.warn('props',props)
+    //console.warn('props',props)
     const [postAdocao, setPostAdocao] = useState();
-    
+   
+    //const {state, dispatch} = useContext(UsersContext);
+    const {state} = useContext(UsersContext);
+    //console.warn('ctx', Object.keys(ctx.state))   
     useEffect(() => {
         api.get("postadocao")
           .then((response) => setPostAdocao(response.data))
@@ -22,7 +25,7 @@ export default props => {
       }, []);
 
 
-    const {state, dispatch} = useContext(UsersContext)
+    
 
     function confirmUserDeletion(item){
         Alert.alert('Escluir Usuário','Deseja escluir o usuario?',[
@@ -62,7 +65,7 @@ export default props => {
         
 
         return (
-            console.warn(item.fotos[0]),
+            //console.warn('fotos',item.fotos[0]),
             /*console.warn(item.fotos),
             <ListItem bottomDivider key={item.id} onPress={() => props.navigation.navigate('PostAdocaoDetalhado',item) }> 
                 <Avatar source={ { uri: item.fotos[0] } } />
@@ -118,7 +121,7 @@ export default props => {
     }
 
     return(
-       <View>
+       <View style={containerPadrao.ContainerPadrao}>
             <FlatList
                 keyExtractor={({id},index)=>id}
                 data={postAdocao}

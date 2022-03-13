@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { Text, View, StyleSheet, Button } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
-import UsersContext from '../../context/UsersContext';
+import UsersContext from '../../context/StateContext';
 
 export default ({route, navigation}) => {
     const [user, setUser] = useState(route.params ? route.params : {})

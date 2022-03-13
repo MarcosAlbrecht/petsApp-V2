@@ -2,10 +2,8 @@ import React, {useState} from 'react';
 import { StyleSheet } from 'react-native';
 
 const estilos = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        backgroundColor: '#312e38',
+    container: {     
+        alignItems: 'center',  
     },
     petCarouselContainer: {
         height: 220,
