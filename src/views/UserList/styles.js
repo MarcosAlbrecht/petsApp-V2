@@ -67,14 +67,37 @@ const estilos = StyleSheet.create({
         paddingTop: 35,
 
     },
+    buttonsContainer:{
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        justifyContent: 'space-between',
+        marginTop: 'auto',
+       
+        paddingTop: 35,
+
+    },
     button: {
         backgroundColor: '#4f5564',
         padding: 4,
         borderRadius: 100,
-        alignItems: 'center',
-        flexDirection: 'row',
+        alignItems:'flex-start',
+        
+    },
+    buttonComentarios: {
+        backgroundColor: '#4f5564',
+        padding: 4,
+        borderRadius: 100,
+        alignItems: 'flex-end',
+        
     },
     buttonText: {
+        color: '#f3f9ff',
+        fontWeight: "800",
+        padding: 4,
+        fontSize: 12,
+        textTransform: 'uppercase',
+    },
+    buttonTextComentarios: {
         color: '#f3f9ff',
         fontWeight: "800",
         padding: 4,

@@ -6,8 +6,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import containerPadrao from '../../styles';
 import adocaoPetCadastroContext from '../../context/adocaoPetCadastroContext';
 import { Picker } from "@react-native-picker/picker";
+import ImagePicker from 'react-native-image-crop-picker';
+import RBSheet from "react-native-raw-bottom-sheet";
+import { SliderBox } from "react-native-image-slider-box";
+import cameraIcon from '../../assets/add-camera-icon.png';
+import {Avatar, BottomSheet, ListItem, Icon} from 'react-native-elements';
 
-export default ({ route, navigation }) => {
+export default ({ route, navigation}) => {
   const [modal, setModal] = useState(false);
   const [cadastroPostAdocao, setcadastroPostAdocao] = useState(route.params ? route.params : {})
   const [email, setEmail] = useState("");
@@ -26,41 +31,38 @@ export default ({ route, navigation }) => {
   const [idadePet, setIdadePet] = useState(1);
   const [postAtivo, setPostAtivo] = useState("SIM");
   const [idUser, setIdUser] = useState();
+  const [fotos, setFotos] = useState();
+  const [isVisible, setIsVisible] = useState(false);
+  const [loadPicture, setLoadPicture] = useState({fotos: [require('../../assets/add-camera-icon.png')]});
 
-  const entrar = () => {
+  const list = [
+    { title: 'Câmera',
+      onPress: () => {setIsVisible(false),
+      console.warn('pressionado botao de camera'),
+      addImagem();
+      },
+      icon: 'camera-alt'
+    },
+    { title: 'Galeria',
+      onPress: () => {setIsVisible(false),
+      console.warn('pressionado botao de galeria')},
+      icon: 'image'
+    },  
+    {
+      title: 'Cancelar',
+      containerStyle: { backgroundColor: '#f4511e' },
+      titleStyle: { color: 'white' },
+      onPress: () => setIsVisible(false),
+      icon: 'cancel'
+    },
+  ];
 
-    let data = {
-      email: email,
-      password: password
-    }
+  
 
-    api.get('login', { params: { email: email, password: password } })
-      .then((response) => {
-        setLoading(false),
-          console.warn('Logou com sucesso', response.data.id)
-        AsyncStorage.setItem("TOKEN", response.data.id)
-        setModal(false);
-
-      })
-      .catch((err) => {
-        console.error("ops! ocorreu um erro" + err);
-        Alert.alert("Usuário não encontrado", "Verifique se o email e senha estão corretos")
-      });
-
-    /*usuarioService.login(data)
-      .then((response) => {
-      setLoading(false)
-      console.warn('Logou com sucesso',response.data.id)
-      navigation.reset({
-        index: 0,
-        routes: [{name: "Principal"}]
-      })
-    })
-    .catch((error) => {
-      setLoading(false)
-      Alert.alert("Usuário não existe")
-    })*/
-  }
+  //var loadPicture = {
+  //  fotos: [require('../../assets/add-camera-icon.png'),
+  //  ]
+  //};
 
   const novopost = {
     nome: nomePet,
@@ -76,7 +78,34 @@ export default ({ route, navigation }) => {
     },
     ativo: postAtivo,
   }
+  
+  const addImagem = () => {
+    setLoadPicture({fotos: [...loadPicture.fotos, 'https://images.ecycle.com.br/wp-content/uploads/2021/05/20195924/o-que-e-paisagem.jpg']})
+  }
 
+  const entrar = () => {
+    
+    let data = {
+      email: email,
+      password: password
+    } 
+
+    api.get('login', { params: { email: email, password: password } })
+      .then((response) => {
+        setLoading(false),
+          console.warn('Logou com sucesso', response.data.id)
+        AsyncStorage.setItem("TOKEN", response.data.id)
+        setModal(false);
+
+      })
+      .catch((err) => {
+        console.error("ops! ocorreu um erro" + err);
+        Alert.alert("Usuário não encontrado", "Verifique se o email e senha estão corretos")
+      });
+   
+  }
+
+  
   const logarComToken = (token) => {
 
     setLoadingToken(true)
@@ -93,8 +122,9 @@ export default ({ route, navigation }) => {
       setLoadingToken(false)
       setIdUser(token)
     }
-
+    
     props.navigation.navigate('adocaoPetCadastro');
+    
   }
 
   const buscarRacas = () => {
@@ -207,6 +237,35 @@ export default ({ route, navigation }) => {
 
             </Picker>
 
+            <Text style={styles.textGeral}>
+              Fotos
+            </Text>  
+            
+            <SliderBox images={loadPicture.fotos}
+                    sliderBoxHeight={200} 
+                    dotColor="#FFEE58"
+                    circleLoop
+                    ImageComponentStyle={{borderRadius: 15, width: '90%', marginTop: 5, marginRight: 15}}
+                    onCurrentImagePressed={(index) => setIsVisible(true)
+                  }
+                    />
+           
+           <BottomSheet modalProps={{}} isVisible={isVisible}>
+            {list.map((l, i) => (
+              <ListItem
+                key={i}
+                containerStyle={l.containerStyle}
+                onPress={l.onPress}
+              >
+                <Icon name={ l.icon } />  
+                <ListItem.Content>
+                  <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                </ListItem.Content>
+              </ListItem>
+            ))}
+          </BottomSheet>      
+            
+
             <View style={styles.btnCard}>
               <TouchableOpacity style={styles.btnSalvar} onPress={() => {salvarPostAdocao(), navigation.popToTop(), console.log('castro',cadastroPostAdocao)}}>
                 <Text style={styles.cardBtnText}>Salvar</Text>
@@ -216,6 +275,9 @@ export default ({ route, navigation }) => {
                 <Text style={styles.cardBtnText}>Cancelar</Text>
 
               </TouchableOpacity>
+
+              
+
             </View>
 
           </>

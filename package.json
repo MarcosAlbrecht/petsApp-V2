@@ -22,12 +22,16 @@
     "react-native": "0.67.2",
     "react-native-elements": "^3.4.2",
     "react-native-feather": "^1.1.2",
-    "react-native-gesture-handler": "^2.2.0",
+    "react-native-gesture-handler": "^2.3.2",
+    "react-native-image-crop-picker": "^0.37.3",
+    "react-native-image-picker": "^4.7.3",
     "react-native-image-slider-box": "^1.1.17",
+    "react-native-raw-bottom-sheet": "^2.2.0",
     "react-native-reanimated": "^2.4.1",
     "react-native-safe-area-context": "^3.4.1",
     "react-native-screens": "^3.12.0",
-    "react-native-vector-icons": "^9.1.0"
+    "react-native-vector-icons": "^9.1.0",
+    "reanimated-bottom-sheet": "^1.0.0-alpha.22"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -98,7 +98,14 @@ const estilos = StyleSheet.create({
         marginVertical: 10,      
         textAlign: 'center',
         fontSize: 15,
-      }
+      },
+      fotosCarousel: {
+        height: 220,
+        alignItems: 'center', 
+        paddingBottom: 10,
+        marginBottom: 1,
+        paddingHorizontal: 20,
+    },
 })
 
 export default estilos;

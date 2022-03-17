@@ -12,6 +12,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import IconFeather from 'react-native-vector-icons/Feather';
 import Authenticate from './views/Authenticate/'
 import adocaoPetCadastro from './views/adocaoPetCadastro';
+import comentariosPostAdocao from './views/ComentariosPostAdocao';
 //const Stack = createStackNavigator();
 const StackAdocao = createStackNavigator();
 
@@ -57,6 +58,13 @@ function AdocaoTabStack(){
                 component={adocaoPetCadastro}
                 options={{
                     title: "Cadastro Post"
+                }}
+            />
+            <StackAdocao.Screen 
+                name='comentariosPostAdocao'
+                component={comentariosPostAdocao}
+                options={{
+                    title: "Comentários"
                 }}
             />
 

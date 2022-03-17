@@ -106,13 +106,18 @@ export default props => {
                         <Text style={style.productTile}>{item.nome}</Text>
                         <Text style={style.productSubTitle}>{item.raca.raca}</Text>
                         <View style={style.idadeContainer}>
-                        <Text style={style.idade}></Text> 
-                             
+                            <Text style={style.idade}></Text>                                           
+                        </View> 
+
+                        <View style={style.buttonsContainer}>
+                            <TouchableOpacity style={style.buttonComentarios} onPress={
+                                () => props.navigation.navigate('comentariosPostAdocao',item)  }>
+                                <Text style={style.buttonTextComentarios}>COMENTARIOS</Text>
+                            </TouchableOpacity>    
                             <TouchableOpacity style={style.button} onPress={
                                 () => props.navigation.navigate('PostAdocaoDetalhado',item)  }>
                                     <Text style={style.buttonText}>MAIS INFORMAÇÕES</Text>
                             </TouchableOpacity>
-                               
                         </View>           
                     </View>
                 </View>
