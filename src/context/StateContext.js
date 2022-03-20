@@ -2,16 +2,18 @@ import React, {createContext, useEffect, useReducer, useState} from 'react';
 import users from '../data/users';
 import api from '../services/api';
 
-const initialState = {users}
+const initialState = {
+    postAdocao:[],
+    
+}
 const UsersContext = createContext({})
 
 const actions = {
     createUser(state, action){
-        const user = action.payload
-        user.id = Math.random()
+        const post = action.payload
         return {
             ...state,
-            users: [...state.users, user],
+            postAdocao: [...state.postAdocao, post],
         }
     },
     updateUser(state, action){
