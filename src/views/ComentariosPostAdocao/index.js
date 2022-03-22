@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, KeyboardAvoidingView } from 'react-native';
+import { View, Text, FlatList, TextInput, KeyboardAvoidingView, Alert } from 'react-native';
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements';
 import style from '../../styles';
 import api from '../../services/api';
@@ -16,10 +16,21 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
     const [idUsuarioLogado, setIdUsuarioLogado] = useState();
     const [comentario, setComentario] = useState();
 
-
+    const novoComentario = {
+        comentario: comentario,
+        usuario: {
+            id: `${idUsuarioLogado}`
+        }, 
+        postAdocao: {
+            id: `${postAdocao.id}`
+        },  
+    }
     useEffect(() => {
         api.get(`comentariosAdocao/${postAdocao.id}`)
-            .then((response) => { setComentarios(response.data), console.warn('comentarios', response.data) })
+            .then((response) => {
+                setComentarios(response.data),
+                    console.warn('comentarios', response.data)
+            })
             .catch((err) => {
                 console.error("ops! ocorreu um erro" + err);
                 console.log('items', response.data)
@@ -33,6 +44,21 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
 
 
     }, []);
+
+    const salvarComentario = () => {
+        
+            api.post("comentariosAdocao/create", novoComentario)
+            .then((response) => {
+            console.warn('Novo Comentarios', response.data);
+            Alert.alert('Sucesso!','Comentário adicionado');
+            comentarios.concat(response.data) 
+            
+        }, (error) => {
+            console.warn('Erro', error);
+        }
+        )
+  
+    }
 
     function getActions(item) {
         return (
@@ -115,25 +141,30 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
     return (
         <View style={style.ContainerPadrao}>
             <View style={styles.containerMensagem}>
-                
-                    <FlatList
-                        keyExtractor={({ id }, index) => id}
-                        data={comentarios}
-                        //renderItem={getUserItem}
-                        renderItem={getComentarioItem}
 
-                    //<Text key={item._id}>{item.nome},{item.idade}</Text>
+                <FlatList
+                    keyExtractor={({ id }, index) => id}
+                    data={comentarios}
+                    //renderItem={getUserItem}
+                    renderItem={getComentarioItem}
+                    extraData={comentarios}
+                //<Text key={item._id}>{item.nome},{item.idade}</Text>
 
-                    />              
+                />
                 <View style={styles.inputContainer}>
-                    
-                    <TextInput style={styles.input} placeholder="Comentar..." />
+
+                    <TextInput style={styles.input} placeholder="Comentar..."
+                    onChangeText={(text) => setComentario(text)}>
+
+                    </TextInput>
                     <Icon
                         name="send" color='white'
                         style={[styles.inputIcon, styles.inputIconSend]}
-                        
+                        onPress={() => {if (comentario.length <= 0) {
+                            Alert.alert('Erro','Náo possível adicioanr comentario em branco')
+                          }else{salvarComentario()}}}
                     />
-                    </View>
+                </View>
             </View>
         </View>
     )

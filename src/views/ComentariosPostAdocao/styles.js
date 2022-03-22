@@ -16,16 +16,16 @@ const estilos = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         padding: 10,
-       
-        
+             
     },
     inputIcon: {
         fontSize: 24,
         color: "white",
-        marginHorizontal: 5
+        marginHorizontal: 10,
+        
     },
     inputIconSend: {
-        color: "white"
+        color: "white",
     },
     container: {
         flex: 1,
@@ -35,11 +35,11 @@ const estilos = StyleSheet.create({
       },
     input: {
         backgroundColor: 'white',
-        width: '90%',
+        width: '88%',
         height: 40,
         color: 'black',
         borderRadius: 20,
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
         
     },
 })

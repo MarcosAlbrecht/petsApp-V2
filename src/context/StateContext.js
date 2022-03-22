@@ -48,23 +48,6 @@ export const UsersProvider = props => {
 
     const [state, dispatch] = useReducer(reducer, initialState)
 
-    useEffect(() => {
-        api.get("postadocao")       
-          .then((response) => {dispatch(
-              {
-                type: 'INITIALIZE_POSTADOCAO',
-                payload:{
-                    ...initialState,
-                    postAdocao: response?.data,
-                    
-                }  
-              }, console.warn(response.data),)})
-          .catch((err) => {
-            console.error("ops! ocorreu um erro" + err);
-            console.log('items',response.data)
-          });
-      }, []);
-
     return(
         <UsersContext.Provider value={{state, dispatch}} >
             {props.children}

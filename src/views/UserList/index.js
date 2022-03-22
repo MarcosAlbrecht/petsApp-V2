@@ -143,7 +143,7 @@ export default ({route, navigation}) => {
                     data={state.postAdocao}
                     //renderItem={getUserItem}
                     renderItem={getUserItem}
-                        
+                    extraData={state.postAdocao}    
                     //<Text key={item._id}>{item.nome},{item.idade}</Text>
                     
                 />
