@@ -1,6 +1,6 @@
 import { getActionFromState } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, FlatList, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, Alert, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements';
 import UsersContext from '../../context/StateContext';
 import api from '../../services/api';
@@ -8,23 +8,31 @@ import style from './styles'
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import containerPadrao from '../../styles';
 
-export default props => {
-    //console.warn('props',props)
-    const [postAdocao, setPostAdocao] = useState();
-   
-    //const {state, dispatch} = useContext(UsersContext);
-    const {state} = useContext(UsersContext);
+export default ({route, navigation}) => {
+    
+    const [postAdocao, setPostAdocao] = useState(route.params ? route.params : {});
+    //const {dispatch} = useContext(UsersContext)
+    const {state, dispatch} = useContext(UsersContext);
+    const [carregando, setCarregando] = useState(true);
+    //const {state} = useContext(UsersContext);
     //console.warn('ctx', Object.keys(ctx.state))   
     useEffect(() => {
         api.get("postadocao")
-          .then((response) => setPostAdocao(response.data))
+          //.then((response) => {setPostAdocao(response.data), console.warn('dados',item.fotos[0])})
+          .then((response) => {
+              response.data.forEach(element => {
+                dispatch({
+                    type: 'createUser',
+                    payload: element,
+                })
+              }),
+              setCarregando(false)
+          })
           .catch((err) => {
-            console.error("ops! ocorreu um erro" + err);
+            console.warn("ops! ocorreu um erro" + err);
             console.log('items',response.data)
           });
       }, []);
-
-
     
 
     function confirmUserDeletion(item){
@@ -48,7 +56,7 @@ export default props => {
         return(
             <>
                 <Button
-                    onPress={() => props.navigation.navigate('UserForm', item) }
+                    onPress={() => navigation.navigate('UserForm', item) }
                     type="clear"
                     icon={<Icon name='edit' size={25} color="orange"/>}
                 />
@@ -65,7 +73,7 @@ export default props => {
         
 
         return (
-            //console.warn('fotos',item.fotos[0]),
+            console.warn('fotos',item.fotos[0]),
             /*console.warn(item.fotos),
             <ListItem bottomDivider key={item.id} onPress={() => props.navigation.navigate('PostAdocaoDetalhado',item) }> 
                 <Avatar source={ { uri: item.fotos[0] } } />
@@ -109,7 +117,7 @@ export default props => {
                         <Text style={style.idade}></Text> 
                              
                             <TouchableOpacity style={style.button} onPress={
-                                () => props.navigation.navigate('PostAdocaoDetalhado',item)  }>
+                                () => navigation.navigate('PostAdocaoDetalhado',item)  }>
                                     <Text style={style.buttonText}>MAIS INFORMAÇÕES</Text>
                             </TouchableOpacity>
                                
@@ -121,17 +129,26 @@ export default props => {
     }
 
     return(
-       <View style={containerPadrao.ContainerPadrao}>
-            <FlatList
-                keyExtractor={({id},index)=>id}
-                data={postAdocao}
-                //renderItem={getUserItem}
-                renderItem={getUserItem}
-                    
-                  //<Text key={item._id}>{item.nome},{item.idade}</Text>
-                
-            />
-        </View>
         
+                
+       <View style={containerPadrao.ContainerPadrao}>
+            {carregando &&
+                <ActivityIndicator color="#fff" size={25} />    
+            }
+            {!carregando &&
+            console.warn('dados do state', state), 
+            <>
+                <FlatList
+                    keyExtractor={({id},index)=>id.toString()}
+                    data={state.postAdocao}
+                    //renderItem={getUserItem}
+                    renderItem={getUserItem}
+                        
+                    //<Text key={item._id}>{item.nome},{item.idade}</Text>
+                    
+                />
+            </>    
+            }
+        </View>
     )
 }

@@ -2,17 +2,27 @@ import React, {createContext, useEffect, useReducer, useState} from 'react';
 import users from '../data/users';
 import api from '../services/api';
 
-const initialState = {users}
+const initialState = {
+    postAdocao: [],
+}
 const UsersContext = createContext({})
 
 const actions = {
     createUser(state, action){
-        const user = action.payload
-        user.id = Math.random()
+        const post = action.payload
+        //user.id = Math.random()
+        //state.postAdocao ? console.warn('tem dados', state) : console.warn('nao tem dados', state);
+        console.warn(' entrou no create. Action recebido', action.payload)
         return {
-            ...state,
-            users: [...state.users, user],
-        }
+            
+            ...state, 
+            postAdocao: state.postAdocao.concat(post)
+            
+            
+            //users: [...state.users, user],
+            
+        }   
+        
     },
     updateUser(state, action){
         const updated = action.payload
@@ -36,32 +46,15 @@ export const UsersProvider = props => {
     
     
     
-    console.warn('valores do initialState', initialState)
+    //console.warn('valores do initialState', initialState)
     //console.warn('valores do postadocao', postAdocao)
     function reducer(state, action){
-        console.warn('action',action)
+        //console.warn('action',action)
         const fn = actions[action.type]
         return fn ? fn(state, action) : state
     }
 
     const [state, dispatch] = useReducer(reducer, initialState)
-
-    useEffect(() => {
-        api.get("postadocao")       
-          .then((response) => {dispatch(
-              {
-                type: 'INITIALIZE_POSTADOCAO',
-                payload:{
-                    ...initialState,
-                    postAdocao: response?.data,
-                    
-                }  
-              }, console.warn(response.data),)})
-          .catch((err) => {
-            console.error("ops! ocorreu um erro" + err);
-            console.log('items',response.data)
-          });
-      }, []);
 
     return(
         <UsersContext.Provider value={{state, dispatch}} >
