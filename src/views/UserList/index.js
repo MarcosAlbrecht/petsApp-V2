@@ -21,7 +21,7 @@ export default ({route, navigation}) => {
           .then((response) => {
               response.data.forEach(element => {
                 dispatch({
-                    type: 'createUser',
+                    type: 'createPostAdocao',
                     payload: element,
                 })
               }),

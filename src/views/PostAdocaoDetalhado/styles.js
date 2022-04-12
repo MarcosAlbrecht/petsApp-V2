@@ -21,7 +21,7 @@ const estilos = StyleSheet.create({
         marginLeft: 5,
         marginRight: 5,
         width: '97%',
-       
+        
     },
     petNomeContainer: {
         flex: 1,
@@ -55,6 +55,63 @@ const estilos = StyleSheet.create({
         fontSize: 18,
         
     },
+    containerMensagem: {
+        flex: 1,
+        flexDirection:'column',
+
+    },
+    userContainer: {
+        flex: 1,
+        alignItems: 'center',
+        flexDirection: 'row',
+        backgroundColor: '#fff',
+        borderRadius: 20,
+        paddingTop: 5,
+        marginLeft: 5,
+        marginRight: 5,
+        width: '97%',       
+        paddingHorizontal: 20,
+        paddingBottom: 10,
+    },
+    userContainerAvatar: {
+        alignContent: 'flex-start',
+        width: '10%',
+        
+    },
+    userContainerInfos: {
+        alignContent: 'flex-start',
+        flex: 1,
+        paddingLeft: 10,
+    },
+    userContainerTopDivider: {
+        borderTopColor: 'black',
+        borderTopWidth: 1,
+        width: '90%',
+        alignItems: 'center',
+        paddingVertical: 10
+    },
+    userContainerTextInfos: {
+        color: 'black',
+        fontWeight: '500'
+    },
+    touchableOpacityStyle: {
+        position: 'absolute',
+        width: 50,
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        right: 10,
+        bottom: 10,
+        backgroundColor: 'red',
+        borderRadius: 50,
+    },
+      floatingButtonStyle: {
+        resizeMode: 'contain',
+        width: 50,
+        height: 35,
+    },
+    
+
     
 })
 

@@ -116,12 +116,26 @@ const estilos = StyleSheet.create({
   },
   inputIdadePet: {
     width: '30%',
-    backgroundColor: '#ffff',
-    
+    backgroundColor: '#ffff',   
     paddingHorizontal: 10,
     fontSize: 15,
     marginHorizontal: 10,
     paddingVertical: 13,
+  },
+  containerAddPhoto: {
+    flex: 1,   
+    alignItems: 'center',    
+    backgroundColor: 'white',
+    fontSize: 15,
+    marginRight: 10,
+    marginLeft: 10,
+    marginVertical: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 20
+  },
+  textContainerAddPhoto:{
+    alignItems: 'center',
+    textAlign: 'center'
   }
 })
 

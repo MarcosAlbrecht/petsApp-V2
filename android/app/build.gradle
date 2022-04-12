@@ -127,7 +127,7 @@ def nativeArchitectures = project.getProperties().get("reactNativeDebugArchitect
 
 android {
     ndkVersion rootProject.ext.ndkVersion
-
+    
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
@@ -136,6 +136,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        vectorDrawables.useSupportLibrary = true
     }
     splits {
         abi {

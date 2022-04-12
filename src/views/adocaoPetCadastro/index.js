@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from "react";
-import { View, Button, Modal, ActivityIndicator, Image, StatusBar, TextInput, TouchableOpacity, ScrollView, Text } from "react-native";
+import { View, Button, Modal, ActivityIndicator, Image, StatusBar, TextInput, TouchableOpacity, ScrollView, Text, Alert } from "react-native";
 import styles from './styles';
 import api from '../../services/api';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,11 +12,14 @@ import { SliderBox } from "react-native-image-slider-box";
 import cameraIcon from '../../assets/add-camera-icon.png';
 import { Avatar, BottomSheet, ListItem, Icon } from 'react-native-elements';
 import UsersContext from '../../context/StateContext';
+import RNFetchBlob from 'react-native-fetch-blob';
+import { color } from "react-native-reanimated";
+
 
 export default ({ route, navigation }) => {
   const {state, dispatch} = useContext(UsersContext);
   const [modal, setModal] = useState(false);
-  const [cadastroPostAdocao, setcadastroPostAdocao] = useState(route.params ? route.params : {})
+  const [cadastroPostAdocao, setcadastroPostAdocao] = useState(route.params ? route.params : {fotos:[], raca:{id:{}} })
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setLoading] = useState(false);
@@ -36,9 +39,11 @@ export default ({ route, navigation }) => {
   const [idUser, setIdUser] = useState();
   const [fotos, setFotos] = useState();
   const [isVisible, setIsVisible] = useState(false);
-  const [loadPicture, setLoadPicture] = useState({ fotos: [require('../../assets/add-camera-icon.png')] });
+  const [isVisibleRemoveFoto, setIsVisibleRemoveFoto] = useState(false);
+  const [loadPicture, setLoadPicture] = useState({fotos: []});
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
+  const [imagemPressionada, setImagemPressionada] = useState();
 
   const list = [
     {
@@ -46,7 +51,8 @@ export default ({ route, navigation }) => {
       onPress: () => {
         setIsVisible(false),
         console.warn('pressionado botao de camera'),
-        addImagem();
+        addPhotoCamera();
+        
       },
       icon: 'camera-alt'
     },
@@ -54,7 +60,8 @@ export default ({ route, navigation }) => {
       title: 'Galeria',
       onPress: () => {
         setIsVisible(false),
-        console.warn('pressionado botao de galeria')
+        console.warn('pressionado botao de galeria'),
+        addImagem();
       },
       icon: 'image'
     },
@@ -63,37 +70,118 @@ export default ({ route, navigation }) => {
       containerStyle: { backgroundColor: '#f4511e' },
       titleStyle: { color: 'white' },
       onPress: () => setIsVisible(false),
-      icon: 'cancel'
+      icon: 'cancel',
+      iconColor: '#ffffff'
     },
   ];
 
-
-
-  //var loadPicture = {
-  //  fotos: [require('../../assets/add-camera-icon.png'),
-  //  ]
-  //};
+  const listRemoverFoto = [
+    {
+      title: 'Remover Foto',
+      onPress: () => {
+        setIsVisibleRemoveFoto(false),
+        console.warn('pressionado botao de galeria'),
+        deleteImagem();
+      },
+      icon: 'image'
+    },
+    {
+      title: 'Cancelar',
+      containerStyle: { backgroundColor: '#f4511e' },
+      titleStyle: { color: 'white' },
+      onPress: () => setIsVisibleRemoveFoto(false),
+      icon: 'cancel',
+      iconColor: '#ffffff'
+    },  
+  ];
 
   const novopost = {
-    nome: nomePet,
-    descricao: descricaoPet,
-    idade_pet: idadePet,
-    porte: porteSelecionada,
-    pelagem: pelagemSelecionada,
+    nome: cadastroPostAdocao.nome,
+    descricao: cadastroPostAdocao.descricao,
+    idade_pet: cadastroPostAdocao.idade_pet,
+    porte: cadastroPostAdocao.porte,
+    pelagem: cadastroPostAdocao.pelagem,
     latitude: '',
     longitude: '',
     raca: {
-      id: `${racaselecionada}`
+      id: `${cadastroPostAdocao.raca}`
     },
     usuario: {
       id: `${idUser}`
     },
-    ativo: postAtivo,
-    fotos: loadPicture.fotos,
+    ativo: cadastroPostAdocao.ativo,
+    fotos: cadastroPostAdocao.fotos,
+  }
+
+  const deleteImagem = () => {
+    //setLoadPicture({ fotos: [...loadPicture.fotos, 'https://images.ecycle.com.br/wp-content/uploads/2021/05/20195924/o-que-e-paisagem.jpg'] })
+    cadastroPostAdocao.fotos.splice(imagemPressionada,1);
+    let auxFotos = cadastroPostAdocao;
+    auxFotos.fotos.splice(imagemPressionada,0);
+    setcadastroPostAdocao(auxFotos);
+
+    setImagemPressionada();
   }
 
   const addImagem = () => {
-    setLoadPicture({ fotos: [...loadPicture.fotos, 'https://images.ecycle.com.br/wp-content/uploads/2021/05/20195924/o-que-e-paisagem.jpg'] })
+    //setLoadPicture({ fotos: [...loadPicture.fotos, 'https://images.ecycle.com.br/wp-content/uploads/2021/05/20195924/o-que-e-paisagem.jpg'] })
+    ImagePicker.openPicker({
+      width: 500,
+      height: 300,
+      cropping: true
+    }).then(image => {
+      console.log(image);
+      convertBase64(image)
+    });
+  }
+
+  const addPhotoCamera = () => {
+    ImagePicker.openCamera({
+      width: 500,
+      height: 300,
+      cropping: true,
+    }).then(image => {
+      console.log(image);
+      convertBase64(image)
+    });
+  }
+
+  const convertBase64 = (image) => {
+    console.log('url da imagem',(image.path));
+    //console.log('tamanho array', loadPicture.fotos.length);
+    //setLoadPicture(loadPicture)
+    RNFetchBlob.fs.readFile(image.path, 'base64')
+    .then((data) => {
+      // handle the data ..
+      if (cadastroPostAdocao.fotos.length >= 3) {
+        Alert.alert('Limite excedido','É possível incluir apenas 3 fotos');  
+      }else{
+        try {
+          var dadosimagem = `data:${image.mime};base64,${data}`;
+          console.log('dados imagem', dadosimagem)
+          //setLoadPicture({ fotos: [...loadPicture.fotos, dadosimagem]})
+          setLoadPicture({fotos: [...loadPicture.fotos, dadosimagem]});
+          let auxFotos = cadastroPostAdocao;
+          auxFotos.fotos.push(dadosimagem);
+          setcadastroPostAdocao(auxFotos);
+
+          //console.log(loadPicture.fotos.length);
+          //console.warn('loadpicture', loadPicture);
+          //cadastroPostAdocao.fotos.splice(cadastroPostAdocao.fotos.length-1, 0, cadastroPostAdocao.fotos.splice(cadastroPostAdocao.fotos.length,1)[0])
+          //setcadastroPostAdocao({...cadastroPostAdocao, [fotos]:[ loadPicture.fotos]})
+          
+          console.log('apos a', cadastroPostAdocao)
+          //cadastroPostAdocao.fotos.splice(0,1)  
+        } catch (error) {
+          console.warn('erro', error)  
+        }
+        
+        //console.log('fotos dados',`data:${image.mime};base64,${data}`);
+        //console.log('tamanho array', loadPicture.fotos.length)
+       
+       // console.log('fotos cadastropet', loadPicture)
+      }
+    })
   }
 
   const entrar = () => {
@@ -109,13 +197,40 @@ export default ({ route, navigation }) => {
           console.warn('Logou com sucesso', response.data.id)
         AsyncStorage.setItem("TOKEN", response.data.id)
         setModal(false);
-
+        setcadastroPostAdocao({...cadastroPostAdocao, usuario: { id : response.data.id }})
       })
       .catch((err) => {
         console.error("ops! ocorreu um erro" + err);
         Alert.alert("Usuário não encontrado", "Verifique se o email e senha estão corretos")
       });
 
+  }
+
+  const entrarComId = (id) => {
+    api.get('loginId', { params: { idUser: id } })
+      .then((response) => {
+        setLoading(false),
+        console.warn('Logou com sucesso entrou Com Id', response.data.id)
+        AsyncStorage.setItem("TOKEN", response.data.id)
+        setModal(false);       
+        setLoadingToken(false);
+        setIdUser(id);
+        dispatch({
+          type: 'createUser',
+          payload: response.data,
+        });
+        console.warn('dados user no state', state.user);
+        if (route.params == null) {
+          setcadastroPostAdocao({...cadastroPostAdocao, usuario: { id : response.data.id }})
+          //setLoadPicture([...loadPicture.fotos, cadastroPostAdocao.fotos]})
+          //setLoadPicture(loadPicture => [...loadPicture, cadastroPostAdocao.fotos]);
+        }
+        
+      })
+      .catch((err) => {
+        console.error("ops! ocorreu um erro" + err);
+        Alert.alert("Usuário não encontrado", "Ocorreu um erro ao logar!")
+      });
   }
 
 
@@ -131,9 +246,15 @@ export default ({ route, navigation }) => {
       setModal(true);
     } else {
       console.warn('token encontrado', token);
-      setModal(false);
-      setLoadingToken(false)
-      setIdUser(token)
+      console.warn('user no state', state.user);
+      if (state.user.length <= 0) {      
+        entrarComId(token) 
+        console.warn('entrou no IF');                
+      }
+      
+      // setModal(false);
+      // setLoadingToken(false)
+      // setIdUser(token)
     }
 
     props.navigation.navigate('adocaoPetCadastro');
@@ -154,19 +275,43 @@ export default ({ route, navigation }) => {
   }
 
   const salvarPostAdocao = () => {
-    console.warn('dados', novopost)
-    api.post("postadocao/create", novopost)
-      .then((response) => {
-        console.warn('Mensagem', response);
-        console.warn('Mensagem', response.data);
-        dispatch({
-          type: 'createUser',
-          payload: response.data,
-      });
-      }, (error) => {
-        console.warn('Erro', error);
-      }
-      )
+    console.log('route params', route);
+    console.log('valor editado do postadocao', cadastroPostAdocao); 
+    if (route.params != null) {
+      console.log('esta editando - novo nome', cadastroPostAdocao.nome);
+      api.put("postadocaoupdate/"+cadastroPostAdocao.id, cadastroPostAdocao)
+        .then((response) => {
+          //console.warn('Mensagem', response);
+          //console.warn('Mensagem', response.data);
+          dispatch({
+            type: 'updatePostAdocao',
+            payload: response.data,
+          });
+          Alert.alert('Sucesso!', 'Post alterado com sucesso.');
+          }, (error) => {
+            console.warn('Erro', error);
+          }
+        )
+      
+
+    }else{
+      //setcadastroPostAdocao({...cadastroPostAdocao.usuario, usuario: { id : idUser }})
+      cadastroPostAdocao.fotos.splice(0,1)
+      console.warn('cadastrando dados', cadastroPostAdocao)
+      api.post("postadocao/create", cadastroPostAdocao)
+        .then((response) => {
+          //console.warn('Mensagem', response);
+          //console.warn('Mensagem', response.data);
+          dispatch({
+            type: 'createPostAdocao',
+            payload: response.data,
+          });
+          Alert.alert('Sucesso!', 'Post cadastrado com sucesso.');
+          }, (error) => {
+            console.warn('Erro', error);
+          }
+        )
+    }  
   }
 
   racaChange = (raca)
@@ -176,7 +321,8 @@ export default ({ route, navigation }) => {
       logarComToken(token)
 
     })
-    buscarRacas()
+    buscarRacas();
+    console.log('valor inicial do postadocao', cadastroPostAdocao);
   }, [])
 
 
@@ -197,7 +343,8 @@ export default ({ route, navigation }) => {
             </Text>
 
             <TextInput style={styles.textInput}
-              onChangeText={(text) => setNomePet(text)}>
+              onChangeText={nome => setcadastroPostAdocao({...cadastroPostAdocao, nome})}
+              value={cadastroPostAdocao.nome}>
             </TextInput>
 
             <Text style={styles.textGeral}>
@@ -205,19 +352,20 @@ export default ({ route, navigation }) => {
             </Text>
 
             <TextInput style={styles.textInputDescricao}
-              onChangeText={(text) => setDescricaoPet(text)}
+              onChangeText={descricao => setcadastroPostAdocao({...cadastroPostAdocao, descricao})}
               autoCorrect={false}
               numberOfLines={10}
               multiline={true}
+              value={cadastroPostAdocao.descricao}
             >
             </TextInput>
 
             <Text style={styles.textGeral}>
               Raça
             </Text>
-
-            <Picker style={styles.textInput} selectedValue={racaselecionada}
-              onValueChange={(itemValue, itemIndex) => { setRacaSelecionada(itemValue) }} >
+            {console.log('antes do piker', cadastroPostAdocao)}
+            <Picker style={styles.textInput} selectedValue={cadastroPostAdocao.raca.id}
+              onValueChange={(raca, itemIndex) =>  setcadastroPostAdocao( {...cadastroPostAdocao, raca: {id: raca}})} >
               {
                 raca.map((cr, key) => {
                   return <Picker.Item label={cr.raca} value={cr.id} key={key} />
@@ -230,8 +378,8 @@ export default ({ route, navigation }) => {
               Porte
             </Text>
 
-            <Picker style={styles.textInput} selectedValue={porteSelecionada}
-              onValueChange={(itemValue, itemIndex) => setPorteSelecionada(itemValue)}>
+            <Picker style={styles.textInput} selectedValue={cadastroPostAdocao.porte}
+              onValueChange={(porte, itemIndex) => setcadastroPostAdocao({...cadastroPostAdocao, porte})}>
               {
                 porte.map((cr, key) => {
                   return <Picker.Item label={cr} value={cr} />
@@ -244,8 +392,8 @@ export default ({ route, navigation }) => {
               Pelagem
             </Text>
 
-            <Picker style={styles.textInput} selectedValue={pelagemSelecionada}
-              onValueChange={(itemValue, itemIndex) => setPelagemSelecionada(itemValue)}>
+            <Picker style={styles.textInput} selectedValue={cadastroPostAdocao.pelagem}
+              onValueChange={(pelagem, itemIndex) => setcadastroPostAdocao({...cadastroPostAdocao, pelagem})}>
               {
                 pelagem.map((cr, key) => {
                   return <Picker.Item label={cr} value={cr} />
@@ -260,8 +408,8 @@ export default ({ route, navigation }) => {
                   Ativo
                 </Text>
 
-                <Picker style={styles.textInput} selectedValue={postAtivo}
-                  onValueChange={(itemValue, itemIndex) => setPostAtivo(itemValue)}>
+                <Picker style={styles.textInput} selectedValue={cadastroPostAdocao.ativo}
+                  onValueChange={(ativo, itemIndex) => setcadastroPostAdocao({...cadastroPostAdocao, ativo})}>
                   {
                     postAtivoSelecao.map((cr, key) => {
                       return <Picker.Item label={cr} value={cr} />
@@ -277,26 +425,48 @@ export default ({ route, navigation }) => {
                 </Text>
 
                 <TextInput style={styles.inputIdadePet} keyboardType="decimal-pad"
-                  onChangeText={(text) => setIdadePet(text)}>
+                  onChangeText={idade_pet => setcadastroPostAdocao({...cadastroPostAdocao, idade_pet})}
+                  value={cadastroPostAdocao.idade_pet}>
                 </TextInput>
               </View>
             </View>
 
+            <TouchableOpacity onPress={()=>{setIsVisible(true)}}>       
+              <View style={styles.containerAddPhoto}>
+                    <Icon name="photo-camera" size={30}/>
+                    <Text style={styles.textContainerAddPhoto}>Clique aqui para adicionar uma foto ou imagem. (Limite de 3)</Text>
+              </View>
+            </TouchableOpacity>      
             <Text style={styles.textGeral}>
               Fotos
             </Text>
+            
 
-            <SliderBox images={loadPicture.fotos}
+            <SliderBox images={cadastroPostAdocao.fotos}
               sliderBoxHeight={200}
               dotColor="#FFEE58"
               circleLoop
               ImageComponentStyle={{ borderRadius: 15, width: '90%', marginTop: 5, marginRight: 15 }}
-              onCurrentImagePressed={(index) => setIsVisible(true)
-              }
+              onCurrentImagePressed={(index) => {setIsVisibleRemoveFoto(true), setImagemPressionada(index), console.log(imagemPressionada)}}
             />
 
             <BottomSheet modalProps={{}} isVisible={isVisible}>
               {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <Icon name={l.icon} color={l.iconColor}/>
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
+
+            <BottomSheet modalProps={{}} isVisible={isVisibleRemoveFoto}>
+              {listRemoverFoto.map((l, i) => (
                 <ListItem
                   key={i}
                   containerStyle={l.containerStyle}

@@ -13,6 +13,8 @@ import IconFeather from 'react-native-vector-icons/Feather';
 import Authenticate from './views/Authenticate/'
 import adocaoPetCadastro from './views/adocaoPetCadastro';
 import comentariosPostAdocao from './views/ComentariosPostAdocao';
+import postPessoaisLista from './views/postPessoaisList';
+
 //const Stack = createStackNavigator();
 const StackAdocao = createStackNavigator();
 
@@ -30,11 +32,18 @@ function AdocaoTabStack(){
                 return{
                     title:"Adocão",
                     headerRight: () => (
+                        <View style={{flexDirection: 'row'}}>
+                        <Button
+                            onPress={() => {}} 
+                            type='clear'
+                            icon={<IconFeather name="filter" size={25} color="white"/>}
+                        />
                         <Button
                             onPress={() => navigation.navigate("adocaoPetCadastro")} 
                             type='clear'
-                            icon={<Icon name="add" size={25} color="white"/>}
+                            icon={<IconFeather name="plus" size={25} color="white"/>}
                         />
+                        </View>
                     )
                 }
             }} 
@@ -75,9 +84,15 @@ function AdocaoTabStack(){
 
 function BlogTabStack(){
     return(
-        <View>
-            <Text>Experiencia Scream</Text>
-        </View>
+        <StackAdocao.Navigator screenOptions={screenOptions}>
+            <StackAdocao.Screen 
+                name='postPessoaisLista'
+                component={postPessoaisLista}
+                options={{
+                    title: "Post Pessoais"
+                }}
+            />    
+        </StackAdocao.Navigator>
     )
 }
 
@@ -92,7 +107,7 @@ function PerfilTabStack(){
 function MyTabs(){
     return(   
         <Tab.Navigator screenOptions={screenOptionsBottonTabs}>
-            <Tab.Screen name='Adocão' component={AdocaoTabStack} options={{  tabBarIcon:({color, size}) => (<IconFeather name="github" size={25} color='#f4511e'/>)  }}  /> 
+            <Tab.Screen name='Adocão' component={AdocaoTabStack} options={{tabBarIcon:({color, size}) => (<IconFeather name="github" size={25} color='#f4511e'/>)   }}  /> 
             <Tab.Screen name='Blog' component={BlogTabStack} options={{  tabBarIcon:({color, size}) => (<IconFeather name="smile" size={25} color='#f4511e'/>)  }} /> 
             <Tab.Screen name='Perfil' component={PerfilTabStack} options={{  tabBarIcon:({color, size}) => (<IconFeather name="user" size={25} color='#f4511e'/>)  }}/>   
         </Tab.Navigator>
@@ -165,5 +180,12 @@ const screenOptions = {
 }
 
 const screenOptionsBottonTabs = {
-    headerShown: false,  
+    headerShown: false,
+    tabBarLabelStyle: {
+        fontSize: 15,
+       
+    },
+    
+      
 }
+
