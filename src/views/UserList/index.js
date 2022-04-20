@@ -7,6 +7,7 @@ import api from '../../services/api';
 import style from './styles'
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import containerPadrao from '../../styles';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default ({route, navigation}) => {
     //console.warn('props',props)
@@ -31,7 +32,67 @@ export default ({route, navigation}) => {
             console.warn("ops! ocorreu um erro" + err);
             console.log('items',response.data)
           });
-      }, []); 
+
+          AsyncStorage.getItem("TOKEN").then((token) => {
+            console.log('token', token)
+            logarComToken(token)
+            
+          })
+          .catch((err) => {
+            console.warn("ops! ocorreu um erro com o toekn" + err);
+            
+          });
+          
+      }, []);
+
+    const entrarComId = (id) => {
+        api.get('loginId', { params: { idUser: id } })
+            .then((response) => {
+                //setLoading(false),
+                    console.warn('Logou com sucesso entrou Com Id', response.data.id)
+                AsyncStorage.setItem("TOKEN", response.data.id)
+                //setModal(false);
+                //setLoadingToken(false);
+                //setIdUser(id);
+                dispatch({
+                    type: 'createUser',
+                    payload: response.data,
+                });
+                console.warn('dados user no state', state.user);
+
+            })
+            .catch((err) => {
+                console.error("ops! ocorreu um erro" + err);
+                Alert.alert("Usuário não encontrado", "Ocorreu um erro ao logar!")
+            });
+    }
+      
+    const logarComToken = (token) => {
+
+        //setLoadingToken(true)
+        let data = {
+            token: token
+        }
+
+        if (token === null) {
+            console.log('token nullo');
+            //setModal(true);
+        } else {
+            console.log('token encontrado', token);
+            console.log('user no state', state.user);
+            if (state.user.length <= 0) {
+                entrarComId(token)
+                console.log('entrou no IF');
+            }
+
+            // setModal(false);
+            // setLoadingToken(false)
+            // setIdUser(token)
+        }
+
+        //props.navigation.navigate('adocaoPetCadastro');
+
+    }
 
     function confirmUserDeletion(item){
         Alert.alert('Escluir Usuário','Deseja escluir o usuario?',[

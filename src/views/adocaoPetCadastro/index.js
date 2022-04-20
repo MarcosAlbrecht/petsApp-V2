@@ -317,10 +317,13 @@ export default ({ route, navigation }) => {
   racaChange = (raca)
 
   useEffect(() => {
-    AsyncStorage.getItem("TOKEN").then((token) => {
-      logarComToken(token)
+    if (state.user.length <= 0) {
+      AsyncStorage.getItem("TOKEN").then((token) => {
+        logarComToken(token),
+        console.log('entrou nop token');
 
-    })
+      })
+    }
     buscarRacas();
     console.log('valor inicial do postadocao', cadastroPostAdocao);
   }, [])

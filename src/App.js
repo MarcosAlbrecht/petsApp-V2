@@ -14,6 +14,12 @@ import Authenticate from './views/Authenticate/'
 import adocaoPetCadastro from './views/adocaoPetCadastro';
 import comentariosPostAdocao from './views/ComentariosPostAdocao';
 import postPessoaisLista from './views/postPessoaisList';
+import comentariosPostPessoal from './views/ComentariosPostPessoal';
+import editarComentario from './views/EditarComentario';
+import postPessoal from './views/postPessoal';
+import PerfilLogado from './views/Perfil/Logado';
+import PerfilEntrar from './views/Perfil/Entrar';
+import PerfilCadastrar from './views/Perfil/Cadastrar';
 
 //const Stack = createStackNavigator();
 const StackAdocao = createStackNavigator();
@@ -66,7 +72,7 @@ function AdocaoTabStack(){
                 name='adocaoPetCadastro'
                 component={adocaoPetCadastro}
                 options={{
-                    title: "Cadastro Post"
+                    title: "Cadastro/Edição Post Adoção"
                 }}
             />
             <StackAdocao.Screen 
@@ -76,6 +82,7 @@ function AdocaoTabStack(){
                     title: "Comentários"
                 }}
             />
+            
 
             
         </StackAdocao.Navigator>
@@ -88,19 +95,82 @@ function BlogTabStack(){
             <StackAdocao.Screen 
                 name='postPessoaisLista'
                 component={postPessoaisLista}
+                options={({navigation}) => {
+                    return{
+                        title:"Posts",
+                        headerRight: () => (
+                            <View style={{flexDirection: 'row'}}>
+                            <Button
+                                onPress={() => {}} 
+                                type='clear'
+                                icon={<IconFeather name="filter" size={25} color="white"/>}
+                            />
+                            <Button
+                                onPress={() => navigation.navigate("postPessoal")} 
+                                type='clear'
+                                icon={<IconFeather name="plus" size={25} color="white"/>}
+                            />
+                            </View>
+                        )
+                    }
+                }} 
+            /> 
+            <StackAdocao.Screen 
+                name='comentariosPostPessoal'
+                component={comentariosPostPessoal}
                 options={{
-                    title: "Post Pessoais"
+                    title: "Comentários"
                 }}
-            />    
+            />  
+            <StackAdocao.Screen 
+                name='editarComentario'
+                component={editarComentario}
+                options={{
+                    title: "Editar Comentário"
+                }}
+            /> 
+            <StackAdocao.Screen 
+                name='postPessoal'
+                component={postPessoal}
+                options={{
+                    title: "Cadastro/Edição Post Pessoal"
+                }}
+            />   
         </StackAdocao.Navigator>
     )
 }
 
 function PerfilTabStack(){
+    
     return(
-        <View>
-            <Text>Perfil Scream</Text>
-        </View>
+
+
+        <StackAdocao.Navigator screenOptions={screenOptions}>
+
+            <StackAdocao.Screen 
+                name='PerfilLogado'
+                component={PerfilLogado}
+                options={{
+                    title: "Perfil"
+                }}
+            />  
+            <StackAdocao.Screen 
+                name='PerfilEntrar'
+                component={PerfilEntrar}
+                options={{
+                    title: "Entrar"
+                }}
+            />  
+            <StackAdocao.Screen 
+                name='PerfilCadastrar'
+                component={PerfilCadastrar}
+                options={{
+                    title: "Cadastrar"
+                }}
+            />  
+            
+            
+        </StackAdocao.Navigator>
     )
 }
 

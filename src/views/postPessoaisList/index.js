@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import { Text, View, Image, FlatList, TouchableOpacity } from 'react-native';
+import { Text, View, Image, FlatList, TouchableOpacity, Alert } from 'react-native';
 import containerPadrao from '../../styles';
 import styles from './styles';
 import { ListItem, Avatar, Icon, BottomSheet } from 'react-native-elements';
@@ -15,23 +15,32 @@ export default ({route, navigation}) => {
   const [carregando, setCarregando] = useState(true);
   const {state, dispatch} = useContext(UsersContext);
   const [isVisible, setIsVisible] = useState(false);
+  const [itemm, setItemm] = useState();
+  const options = {
+    headers: {
+          "Accept": 'application/json',
+          "Content-Type": "application/json"
+    }
+ }
 
   const list = [
     {
       title: 'Deletar Post',
       onPress: () => {
         setIsVisible(false),
-        console.warn('pressionado botao de galeria')
-        //deleteImagem();
+        console.log('pressionado botao de delete post pessoal'),
+        deletePostPessoal(itemm)   
       },
-      icon: 'delete'
+      icon: 'delete',
+      
     },
     {
       title: 'Editar Post',
       onPress: () => {
         setIsVisible(false),
-        console.warn('pressionado botao de galeria')
+        console.log('pressionado botao de galeria')
         //deleteImagem();
+        navigation.navigate('postPessoal', itemm)
       },
       icon: 'edit'
     },
@@ -46,7 +55,7 @@ export default ({route, navigation}) => {
   ];
 
   useEffect(() => {
-    api.get("postpessoal")
+    api.get("postpessoal", options)
       //.then((response) => {setPostAdocao(response.data), console.warn('dados',item.fotos[0])})
       .then((response) => {
           response.data.forEach(element => {
@@ -64,6 +73,52 @@ export default ({route, navigation}) => {
       });
   }, []); 
 
+  function renderButtonMore(item){
+    console.log('item'.item)
+    if (state.user.length >= 0) {
+     
+      if (item.usuario.id == state.user[0]._id) {
+        return(                
+            <TouchableOpacity onPress={()=>{setIsVisible(true), setItemm(item)}}>
+                <Feather name='more-horizontal' size={20}/> 
+            </TouchableOpacity>      
+        ); 
+      } else {
+        return null; 
+      }
+    }else {
+      return null; 
+    }
+  }
+  
+  function deletePostPessoal(item) {
+    Alert.alert('Escluir Post', 'Deseja excluir o post?', [
+      {
+        text: 'Sim',
+        onPress() {
+          api.delete(`deletePostPessoal/${item.id}`)
+            .then((response) => {
+              setCarregando(false)
+              console.log('comentarios post pessoal', state.comentariosPostPessoal)
+              setIsVisible(false),
+                dispatch({
+                  type: 'deletePostPessoal',
+                  payload: item,
+                }),
+                Alert.alert('Sucesso!', 'Post deletado');
+            })
+            .catch((err) => {
+              console.warn("ops! ocorreu um erro" + err);
+              console.log('items', response.data)
+            });
+        }
+      },
+      {
+        text: 'Não'
+      }
+    ])
+  }
+
   const CardHeader = ({ item }) => {
     return(
       <View style={styles.containerHead}>
@@ -79,10 +134,8 @@ export default ({route, navigation}) => {
           </View>
         </View>
 
-        <View style={{flexDirection: 'row', marginRight: 10}}>
-          <TouchableOpacity onPress={()=>{setIsVisible(true)}}>
-            <Feather name='more-horizontal' size={20}/> 
-          </TouchableOpacity>  
+        <View style={{flexDirection: 'row', marginRight: 10}}>        
+          {state.user.length > 0 ? renderButtonMore(item) : null}
         </View>
       </View>
     );
@@ -140,7 +193,7 @@ export default ({route, navigation}) => {
                   size={20}
                   color='blue'
                 /> 
-              <Text> 35</Text>
+              <Text> {item.comentariosPessoal}</Text>
           </View>
           
             
@@ -192,7 +245,8 @@ export default ({route, navigation}) => {
                   size={20}
                   color='black'
                 /> 
-              <TouchableOpacity>     
+              <TouchableOpacity onPress={
+                () => navigation.navigate('comentariosPostPessoal',item)  }>     
               <Text>  Comentar</Text>
               </TouchableOpacity>
             </View>    
@@ -204,7 +258,7 @@ export default ({route, navigation}) => {
                 <ListItem
                   key={i}
                   containerStyle={l.containerStyle}
-                  onPress={l.onPress}
+                  onPress={l.onPress} 
                 >
                   <Icon name={l.icon} color={l.iconColor}/>
                   <ListItem.Content>
