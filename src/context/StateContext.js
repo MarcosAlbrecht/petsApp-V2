@@ -7,6 +7,7 @@ const initialState = {
     user:[],
     postPessoal:[],
     comentariosPostPessoal:[],
+    comentariosPostAdocao:[]
 }
 const UsersContext = createContext({})
 
@@ -122,6 +123,55 @@ const actions = {
         return {
             ...state,
             comentariosPostPessoal: [],
+        }
+    },
+
+
+
+    createComentarioPostAdocao(state, action){
+        const post = action.payload
+        //let auxComents = initialState;
+        //auxComents.comentariosPostPessoal.push(post);
+        //setcadastroPostAdocao(auxFotos);
+        return {
+            ...state,
+            comentariosPostAdocao: [...state.comentariosPostAdocao, post],
+        }
+    },
+    addComentarioPostAdocao(state, action){
+        const post = action.payload
+        
+        console.log('add comentarios', post) 
+        return {
+            ...state,
+            comentariosPostAdocao: [...state.comentariosPostAdocao, post],
+            
+        } 
+        console.log('entrou do add comentarios', state.comentariosPostAdocao)  
+    },
+    updateComentarioPostAdocao(state, action){
+        const updated = action.payload
+       
+        return {
+            ...state,
+            comentariosPostAdocao: state.comentariosPostAdocao.map(u => u.id === updated.id ? updated : u)
+            
+        } 
+        console.log('entrou do add comentarios', state.comentariosPostPessoal)  
+    },
+    deleteComentarioPostAdocao(state, action){
+        const post = action.payload
+        console.log('entrou do delete comentarios') 
+        return {
+            ...state,
+            comentariosPostAdocao: state.comentariosPostAdocao.filter(u => u.id !== post.id),
+        }
+    },
+    cleanComentarioPostAdocao(state){
+        //const post = action.payload
+        return {
+            ...state,
+            comentariosPostAdocao: [],
         }
     },
 }

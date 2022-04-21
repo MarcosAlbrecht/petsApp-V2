@@ -82,6 +82,13 @@ function AdocaoTabStack(){
                     title: "Comentários"
                 }}
             />
+            <StackAdocao.Screen 
+                name='editarComentario'
+                component={editarComentario}
+                options={{
+                    title: "Editar Comentário"
+                }}
+            /> 
             
 
             

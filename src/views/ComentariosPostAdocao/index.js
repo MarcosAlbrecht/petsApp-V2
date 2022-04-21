@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TextInput, KeyboardAvoidingView, Alert } from 'react-native';
+import React, {useContext, useEffect, useState } from 'react';
+import { View, Text, FlatList, TextInput, KeyboardAvoidingView, Alert, ActivityIndicator } from 'react-native';
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements';
 import style from '../../styles';
 import api from '../../services/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RBSheet from "react-native-raw-bottom-sheet";
 import styles from './styles';
+import UsersContext from '../../context/StateContext';
 
 // import { Container } from './styles';
 
@@ -15,6 +16,8 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
     const [comentarios, setComentarios] = useState();
     const [idUsuarioLogado, setIdUsuarioLogado] = useState();
     const [comentario, setComentario] = useState();
+    const [carregando, setCarregando] = useState(true);
+    const {state, dispatch} = useContext(UsersContext);
 
     const novoComentario = {
         comentario: comentario,
@@ -26,14 +29,35 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
         },  
     }
     useEffect(() => {
+        // api.get(`comentariosAdocao/${postAdocao.id}`)
+        //     .then((response) => {
+        //         setComentarios(response.data),
+        //             console.warn('comentarios', response.data)
+        //     })
+        //     .catch((err) => {
+        //         console.error("ops! ocorreu um erro" + err);
+        //         console.log('items', response.data)
+        //     });
+        dispatch({
+            type: 'cleanComentarioPostAdocao',
+            //payload: element,
+        })
         api.get(`comentariosAdocao/${postAdocao.id}`)
             .then((response) => {
-                setComentarios(response.data),
-                    console.warn('comentarios', response.data)
+                response.data.forEach(element => {
+                    dispatch({
+                        type: 'createComentarioPostAdocao',
+                        payload: element,
+                    })
+                    console.log('comentario post pessoal', element)
+                }),
+                setCarregando(false)
+                console.log('comentarios post pessoal', state.comentariosPostPessoal)
             })
             .catch((err) => {
-                console.error("ops! ocorreu um erro" + err);
-                console.log('items', response.data)
+                console.warn("ops! ocorreu um erro" + err);
+                console.log('items', response.data);
+                setCarregando(false)
             });
 
         AsyncStorage.getItem("TOKEN").then((token) => {
@@ -47,11 +71,16 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
 
     const salvarComentario = () => {
         
-            api.post("comentariosAdocao/create", novoComentario)
+        api.post("comentariosAdocao/create", novoComentario)
             .then((response) => {
-            console.warn('Novo Comentarios', response.data);
-            Alert.alert('Sucesso!','Comentário adicionado');
-            comentarios.concat(response.data) 
+                dispatch({
+                    
+                    type: 'addComentarioPostAdocao',
+                    payload: response.data,
+                })
+                console.warn('Novo Comentarios', response.data);
+                Alert.alert('Sucesso!','Comentário adicionado');
+                comentarios.concat(response.data) 
             
         }, (error) => {
             console.warn('Erro', error);
@@ -64,7 +93,12 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
         return (
             <>
                 <Button
-                    onPress={() => navigation.navigate('UserForm', item)}
+                    onPress={() => navigation.navigate('editarComentario', 
+                        {
+                            "value": item,
+                            "tela": "comentarioadocao"
+                        }
+                    )}
                     type="clear"
                     icon={<Icon name='edit' size={25} color="orange" />}
                 />
@@ -141,30 +175,37 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
     return (
         <View style={style.ContainerPadrao}>
             <View style={styles.containerMensagem}>
+                {carregando &&
+                    <ActivityIndicator color="#fff" size={25} />    
+                }
+                {!carregando &&
+                <>
 
-                <FlatList
-                    keyExtractor={({ id }, index) => id}
-                    data={comentarios}
-                    //renderItem={getUserItem}
-                    renderItem={getComentarioItem}
-                    extraData={comentarios}
-                //<Text key={item._id}>{item.nome},{item.idade}</Text>
+                    <FlatList
+                        keyExtractor={({ id }, index) => id}
+                        data={state.comentariosPostAdocao}
+                        //renderItem={getUserItem}
+                        renderItem={getComentarioItem}
+                        extraData={state.comentariosPostAdocao}
+                    //<Text key={item._id}>{item.nome},{item.idade}</Text>
 
-                />
-                <View style={styles.inputContainer}>
-
-                    <TextInput style={styles.input} placeholder="Comentar..."
-                    onChangeText={(text) => setComentario(text)}>
-
-                    </TextInput>
-                    <Icon
-                        name="send" color='white'
-                        style={[styles.inputIcon, styles.inputIconSend]}
-                        onPress={() => {if (comentario.length <= 0) {
-                            Alert.alert('Erro','Náo possível adicioanr comentario em branco')
-                          }else{salvarComentario()}}}
                     />
-                </View>
+                    <View style={styles.inputContainer}>
+
+                        <TextInput style={styles.input} placeholder="Comentar..."
+                        onChangeText={(text) => setComentario(text)}>
+
+                        </TextInput>
+                        <Icon
+                            name="send" color='white'
+                            style={[styles.inputIcon, styles.inputIconSend]}
+                            onPress={() => {if (comentario.length <= 0) {
+                                Alert.alert('Erro','Náo possível adicioanr comentario em branco')
+                            }else{salvarComentario()}}}
+                        />
+                    </View>
+                </>
+                }
             </View>
         </View>
     )

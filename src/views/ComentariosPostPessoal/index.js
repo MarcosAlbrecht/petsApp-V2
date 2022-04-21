@@ -48,7 +48,8 @@ const ComentariosPostPessoal = ({route, navigation}) => {
             })
             .catch((err) => {
               console.warn("ops! ocorreu um erro" + err);
-              console.log('items',response.data)
+              console.log('items',response.data);
+              setCarregando(false)
             });
 
         AsyncStorage.getItem("TOKEN").then((token) => {
@@ -71,7 +72,8 @@ const ComentariosPostPessoal = ({route, navigation}) => {
                     payload: response.data,
                 })
                 console.log('Novo Comentarios', response.data);
-                console.log('todos comentarios do state', state.comentariosPostPessoal);
+                //console.log('todos comentarios do state', state.comentariosPostPessoal);
+                setComentario('');
                 Alert.alert('Sucesso!','Comentário adicionado'); 
             
         }, (error) => {
@@ -85,7 +87,12 @@ const ComentariosPostPessoal = ({route, navigation}) => {
         return (
             <>
                 <Button
-                    onPress={() => navigation.navigate('editarComentario', item)}
+                    onPress={() => navigation.navigate('editarComentario', 
+                        {
+                            "value": item,
+                            "tela": "comentariopessoal"
+                        }
+                    )}
                     type="clear"
                     icon={<Icon name='edit' size={25} color="orange" />}
                 />
