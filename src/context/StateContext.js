@@ -3,26 +3,18 @@ import users from '../data/users';
 import api from '../services/api';
 
 const initialState = {
-    postAdocao: [],
+    postAdocao:[],
+    
 }
 const UsersContext = createContext({})
 
 const actions = {
     createUser(state, action){
         const post = action.payload
-        //user.id = Math.random()
-        //state.postAdocao ? console.warn('tem dados', state) : console.warn('nao tem dados', state);
-        console.warn(' entrou no create. Action recebido', action.payload)
         return {
-            
-            ...state, 
-            postAdocao: state.postAdocao.concat(post)
-            
-            
-            //users: [...state.users, user],
-            
-        }   
-        
+            ...state,
+            postAdocao: [...state.postAdocao, post],
+        }
     },
     updateUser(state, action){
         const updated = action.payload

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Button, Modal, ActivityIndicator, Image, StatusBar, TextInput, TouchableOpacity, ScrollView, Text } from "react-native";
 import styles from './styles';
 import api from '../../services/api';
@@ -6,8 +6,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import containerPadrao from '../../styles';
 import adocaoPetCadastroContext from '../../context/adocaoPetCadastroContext';
 import { Picker } from "@react-native-picker/picker";
+import ImagePicker from 'react-native-image-crop-picker';
+import RBSheet from "react-native-raw-bottom-sheet";
+import { SliderBox } from "react-native-image-slider-box";
+import cameraIcon from '../../assets/add-camera-icon.png';
+import { Avatar, BottomSheet, ListItem, Icon } from 'react-native-elements';
+import UsersContext from '../../context/StateContext';
 
 export default ({ route, navigation }) => {
+  const {state, dispatch} = useContext(UsersContext);
   const [modal, setModal] = useState(false);
   const [cadastroPostAdocao, setcadastroPostAdocao] = useState(route.params ? route.params : {})
   const [email, setEmail] = useState("");
@@ -18,14 +25,76 @@ export default ({ route, navigation }) => {
   const [raca, setRaca] = useState("");
   const [racaselecionada, setRacaSelecionada] = useState("");
   const [porte, setPorte] = useState(['Pequeno', 'Médio', 'Grande']);
-  const [porteSelecionada, setPorteSelecionada] = useState("");
+  const [porteSelecionada, setPorteSelecionada] = useState("Pequeno");
   const [pelagem, setPelagem] = useState(['Curto', 'Médio', 'Longo']);
-  const [pelagemSelecionada, setPelagemSelecionada] = useState("");
+  const [pelagemSelecionada, setPelagemSelecionada] = useState("Curto");
   const [nomePet, setNomePet] = useState("");
   const [descricaoPet, setDescricaoPet] = useState("");
-  const [idadePet, setIdadePet] = useState(1);
-  const [postAtivo, setPostAtivo] = useState("SIM");
+  const [idadePet, setIdadePet] = useState();
+  const [postAtivo, setPostAtivo] = useState("");
+  const [postAtivoSelecao, setPostAtivoSelecao] = useState(['SIM', 'NÃO']);
   const [idUser, setIdUser] = useState();
+  const [fotos, setFotos] = useState();
+  const [isVisible, setIsVisible] = useState(false);
+  const [loadPicture, setLoadPicture] = useState({ fotos: [require('../../assets/add-camera-icon.png')] });
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+
+  const list = [
+    {
+      title: 'Câmera',
+      onPress: () => {
+        setIsVisible(false),
+        console.warn('pressionado botao de camera'),
+        addImagem();
+      },
+      icon: 'camera-alt'
+    },
+    {
+      title: 'Galeria',
+      onPress: () => {
+        setIsVisible(false),
+        console.warn('pressionado botao de galeria')
+      },
+      icon: 'image'
+    },
+    {
+      title: 'Cancelar',
+      containerStyle: { backgroundColor: '#f4511e' },
+      titleStyle: { color: 'white' },
+      onPress: () => setIsVisible(false),
+      icon: 'cancel'
+    },
+  ];
+
+
+
+  //var loadPicture = {
+  //  fotos: [require('../../assets/add-camera-icon.png'),
+  //  ]
+  //};
+
+  const novopost = {
+    nome: nomePet,
+    descricao: descricaoPet,
+    idade_pet: idadePet,
+    porte: porteSelecionada,
+    pelagem: pelagemSelecionada,
+    latitude: '',
+    longitude: '',
+    raca: {
+      id: `${racaselecionada}`
+    },
+    usuario: {
+      id: `${idUser}`
+    },
+    ativo: postAtivo,
+    fotos: loadPicture.fotos,
+  }
+
+  const addImagem = () => {
+    setLoadPicture({ fotos: [...loadPicture.fotos, 'https://images.ecycle.com.br/wp-content/uploads/2021/05/20195924/o-que-e-paisagem.jpg'] })
+  }
 
   const entrar = () => {
 
@@ -47,35 +116,8 @@ export default ({ route, navigation }) => {
         Alert.alert("Usuário não encontrado", "Verifique se o email e senha estão corretos")
       });
 
-    /*usuarioService.login(data)
-      .then((response) => {
-      setLoading(false)
-      console.warn('Logou com sucesso',response.data.id)
-      navigation.reset({
-        index: 0,
-        routes: [{name: "Principal"}]
-      })
-    })
-    .catch((error) => {
-      setLoading(false)
-      Alert.alert("Usuário não existe")
-    })*/
   }
 
-  const novopost = {
-    nome: nomePet,
-    descricao: descricaoPet,
-    idade_pet: idadePet,
-    porte: porteSelecionada,
-    pelagem: pelagemSelecionada,
-    raca: {
-      id: `${racaselecionada}` 
-    },
-    usuario:{ 
-      id:`${idUser}`
-    },
-    ativo: postAtivo,
-  }
 
   const logarComToken = (token) => {
 
@@ -95,6 +137,7 @@ export default ({ route, navigation }) => {
     }
 
     props.navigation.navigate('adocaoPetCadastro');
+
   }
 
   const buscarRacas = () => {
@@ -114,12 +157,16 @@ export default ({ route, navigation }) => {
     console.warn('dados', novopost)
     api.post("postadocao/create", novopost)
       .then((response) => {
-          console.warn('Mensagem', response);
-          console.warn('Mensagem', response.data);
+        console.warn('Mensagem', response);
+        console.warn('Mensagem', response.data);
+        dispatch({
+          type: 'createUser',
+          payload: response.data,
+      });
       }, (error) => {
-        console.warn('Erro', error);  
+        console.warn('Erro', error);
       }
-      )   
+      )
   }
 
   racaChange = (raca)
@@ -132,7 +179,7 @@ export default ({ route, navigation }) => {
     buscarRacas()
   }, [])
 
-  
+
 
   return (
     <ScrollView style={containerPadrao.ContainerPadrao}>
@@ -170,7 +217,7 @@ export default ({ route, navigation }) => {
             </Text>
 
             <Picker style={styles.textInput} selectedValue={racaselecionada}
-              onValueChange={(itemValue, itemIndex)=> {setRacaSelecionada(itemValue) } } >
+              onValueChange={(itemValue, itemIndex) => { setRacaSelecionada(itemValue) }} >
               {
                 raca.map((cr, key) => {
                   return <Picker.Item label={cr.raca} value={cr.id} key={key} />
@@ -178,7 +225,7 @@ export default ({ route, navigation }) => {
               }
 
             </Picker>
-            
+
             <Text style={styles.textGeral}>
               Porte
             </Text>
@@ -207,8 +254,65 @@ export default ({ route, navigation }) => {
 
             </Picker>
 
+            <View style={styles.containerAtivo}>
+              <View style={styles.subContainerAtivo}>
+                <Text style={styles.textGeral}>
+                  Ativo
+                </Text>
+
+                <Picker style={styles.textInput} selectedValue={postAtivo}
+                  onValueChange={(itemValue, itemIndex) => setPostAtivo(itemValue)}>
+                  {
+                    postAtivoSelecao.map((cr, key) => {
+                      return <Picker.Item label={cr} value={cr} />
+                    })
+                  }
+
+                </Picker>
+              </View>
+
+              <View style={styles.subContainerAtivo}>
+                <Text style={styles.textGeral}>
+                  Idade Pet
+                </Text>
+
+                <TextInput style={styles.inputIdadePet} keyboardType="decimal-pad"
+                  onChangeText={(text) => setIdadePet(text)}>
+                </TextInput>
+              </View>
+            </View>
+
+            <Text style={styles.textGeral}>
+              Fotos
+            </Text>
+
+            <SliderBox images={loadPicture.fotos}
+              sliderBoxHeight={200}
+              dotColor="#FFEE58"
+              circleLoop
+              ImageComponentStyle={{ borderRadius: 15, width: '90%', marginTop: 5, marginRight: 15 }}
+              onCurrentImagePressed={(index) => setIsVisible(true)
+              }
+            />
+
+            <BottomSheet modalProps={{}} isVisible={isVisible}>
+              {list.map((l, i) => (
+                <ListItem
+                  key={i}
+                  containerStyle={l.containerStyle}
+                  onPress={l.onPress}
+                >
+                  <Icon name={l.icon} />
+                  <ListItem.Content>
+                    <ListItem.Title style={l.titleStyle}>{l.title}</ListItem.Title>
+                  </ListItem.Content>
+                </ListItem>
+              ))}
+            </BottomSheet>
+
+
             <View style={styles.btnCard}>
-              <TouchableOpacity style={styles.btnSalvar} onPress={() => {salvarPostAdocao(), navigation.popToTop(), console.log('castro',cadastroPostAdocao)}}>
+              <TouchableOpacity style={styles.btnSalvar} onPress={() => { salvarPostAdocao(), navigation.popToTop(), console.log('castro', cadastroPostAdocao) }}>
                 <Text style={styles.cardBtnText}>Salvar</Text>
 
               </TouchableOpacity>
@@ -216,6 +320,9 @@ export default ({ route, navigation }) => {
                 <Text style={styles.cardBtnText}>Cancelar</Text>
 
               </TouchableOpacity>
+
+
+
             </View>
 
           </>
