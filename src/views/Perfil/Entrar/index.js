@@ -71,7 +71,11 @@ const Entrar = ({ route, navigation }) => {
                   <TouchableOpacity>
                     <Text style={styles.forgot_button}>Esqueceu a senha?</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { navigation.navigate('PerfilCadastrar')}}>
+                  <TouchableOpacity onPress={() => { navigation.navigate('PerfilCadastrar', {
+                                "value": item,
+                                "editando": false
+                            }
+                  )}}>
                     <Text style={styles.forgot_button}>Criar Conta</Text>
                   </TouchableOpacity>
 

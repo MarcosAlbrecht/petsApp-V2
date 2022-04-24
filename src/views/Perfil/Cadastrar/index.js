@@ -16,14 +16,16 @@ import { TextInputMask } from 'react-native-masked-text';
 import RNFetchBlob from 'react-native-fetch-blob';
 import ImagePicker from 'react-native-image-crop-picker';
 import { Icon, BottomSheet, ListItem } from 'react-native-elements';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { set } from 'react-native-reanimated';
 
 
 // import { Container } from './styles';
 
 const Cadastrar = ({ route, navigation }) => {
     const {state, dispatch} = useContext(UsersContext);
-    const [user, setUser] = useState(route.params ? route.params : { foto:"" })
+    const [user, setUser] = useState(route.params.value ? route.params.value : { foto:"", endereco:{id:""} })
     const [isVisible, setIsVisible] = useState(false);
     const [endereco, setEndereco] = useState(); 
     const [cep, setCep] = useState();
@@ -59,9 +61,19 @@ const Cadastrar = ({ route, navigation }) => {
     ];
 
     useEffect(() => {
-        if (state.user.length <= 0) {
-            
-        }
+        console.log('value user', route.params.value)
+        if (route.params.editando) {
+          //console.log('entrou no id - user id', user.endereco.id)
+          api.get('enderecoid/'+user.endereco.id)
+          .then((response) => {
+            setEndereco(response.data);
+            console.log('entrou no id', response.data)
+
+          })
+          .catch((err) => {
+            console.log('Ocorreu um erro ao listar o endereco', err)
+          })    
+        }else console.log('entrou no else')
         
     }, [])
     
@@ -146,15 +158,32 @@ const Cadastrar = ({ route, navigation }) => {
     }
 
     const salvarUsuario = () => {
-      api.post('users/create')
+      
+      api.post('endereco/create', endereco)
       .then((response) => {
-        dispatch({
-          type: 'createUser',
-          payload: response.data,
-      })
-      }).catch((err) => {
-        console.log('Ocorreu um erro ao salvar usuario', err)
-      })
+        let userAux;
+        userAux = user;
+        userAux.endereco.id = response.data.id;
+        setUser(userAux);
+
+        console.log('valores do user', response.data);
+
+        api.post('users/create', user)
+        .then((retorno) => {
+          dispatch({
+            type: 'createUser',
+            payload: retorno.data,
+          })
+          AsyncStorage.setItem("TOKEN", retorno.data.id)  
+          }).catch((err) => {
+            console.log('Ocorreu um erro ao salvar usuario', err)
+          })
+
+
+      }).then((err) => {
+        console.warn('ocorreu um erro ao inserir endereco', err)
+      });
+      
     }
 
     return(
@@ -198,9 +227,9 @@ const Cadastrar = ({ route, navigation }) => {
             <View style={{width: '20%'}}>
               <TextInput style={styles.textInputDDD}       
                 onChangeText={ddd => setUser({...user, ddd})}
-                value={user.ddd}
+                value={route.params.editando ? user.ddd.toString() : user.ddd}
                 placeholder={"DDD:"}
-                keyboardType='number-pad'
+                keyboardType='numeric'
                 >
               </TextInput>
             </View>
@@ -213,7 +242,7 @@ const Cadastrar = ({ route, navigation }) => {
                 onChangeText={telefone => setUser({...user, telefone})}
                 value={user.telefone}
                 placeholder={"Celular:"}
-                keyboardType='number-pad'
+                keyboardType='phone-pad' 
                 >
               </TextInputMask>
             </View>
@@ -222,13 +251,15 @@ const Cadastrar = ({ route, navigation }) => {
           <TextInput style={styles.textInput}   
             onChangeText={email => setUser({...user, email})}
             value={user.email}
-            placeholder={"Email:"}           
+            placeholder={"Email:"}
+            keyboardType='email-address'         
             >
           </TextInput>
           <TextInput style={styles.textInput}   
             onChangeText={password => setUser({...user, password})}
             value={user.password}
-            placeholder={"Senha:"}           
+            placeholder={"Senha:"} 
+            secureTextEntry={true}        
             >
           </TextInput>
 
@@ -285,16 +316,24 @@ const Cadastrar = ({ route, navigation }) => {
                 >
               </TextInput>
               <View style={{flexDirection:'row'}}>
-            <View style={{width: '20%'}}>
+            <View style={{width: '30%'}}>
               <TextInput style={styles.textInputDDD}       
-                onChangeText={numero => setUser({...user, numero})}
+                onChangeText={numero => setUser({...endereco, numero})}
                 value={endereco != null ? endereco.numero : null}
                 placeholder={"Número:"}
                 keyboardType='numeric'
                 >
               </TextInput>
             </View>
-            <View style={{width: '80%'}}>
+            <View style={{width: '20%'}}>
+              <TextInput style={styles.textInputDDD}       
+                onChangeText={uf => setUser({...endereco, uf})}
+                value={endereco != null ? endereco.uf : null}
+                placeholder={"UF:"}  
+                >
+              </TextInput>
+            </View>
+            <View style={{width: '70%'}}>
               
               
             </View>
@@ -305,7 +344,7 @@ const Cadastrar = ({ route, navigation }) => {
             
 
           <View style={styles.btnCard}>
-            <TouchableOpacity style={styles.btnSalvar} onPress={() => { salvarUsuario(), navigation.popToTop(), console.log('castro', cadastroPostAdocao) }}>
+            <TouchableOpacity style={styles.btnSalvar} onPress={() => { salvarUsuario(), navigation.popToTop() }}>
               <Text style={styles.cardBtnText}>Salvar</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.btnSalvar} onPress={() => navigation.popToTop()}>
