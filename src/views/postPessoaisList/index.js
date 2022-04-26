@@ -16,6 +16,8 @@ export default ({route, navigation}) => {
   const {state, dispatch} = useContext(UsersContext);
   const [isVisible, setIsVisible] = useState(false);
   const [itemm, setItemm] = useState();
+  const [liked, setLiked] = useState(false);
+  const [userLogado, setUserLogado] = useState();
   const options = {
     headers: {
           "Accept": 'application/json',
@@ -54,27 +56,60 @@ export default ({route, navigation}) => {
     },  
   ];
 
+  
+  const verificarLike = function(item) {
+      for (let index = 0; index < item.length; index++) {
+        const element = item[index];
+        
+        if (element === state.user[0]._id) {
+          return true;
+        }else
+          return false;
+      }
+      //console.log('VALOR ',item)
+      
+    
+  } 
+
   useEffect(() => {
     api.get("postpessoal", options)
       //.then((response) => {setPostAdocao(response.data), console.warn('dados',item.fotos[0])})
       .then((response) => {
           response.data.forEach(element => {
+            if (state.user.length > 0) {
+              console.log('executando funcao verificalike',verificarLike(element.likes))
+              if (verificarLike(element.likes)){
+                //console.log('entrou no if dos likes ',element.likes.length)
+                element.liked = true
+              }
+            }
+            
             dispatch({
                 type: 'createPostPessoal',
                 payload: element,
-            })
+            });
+            console.log('likeds? ',element.likes)
           }),
           setCarregando(false);
-          console.log('items',response.data)
+          //console.log('items',response.data)
+          
       })
       .catch((err) => {
-        console.warn("ops! ocorreu um erro" + err);
-        console.log('items',status.postPessoal)
+        console.warn("ops! ocorreu um erro eao carregar postPessoal" + err);
+        //console.log('items',status.postPessoal)
       });
+
+      
+
+      if (state.user.length > 0) {
+        
+        setUserLogado(state.user[0]._id);
+        console.log('ususario logado',  userLogado)
+      }else console.log('ususario nao logado', state.user[0]._id)
   }, []); 
 
   function renderButtonMore(item){
-    console.log('item'.item)
+    //console.log('item'.item)
     if (state.user.length >= 0) {
      
       if (item.usuario.id == state.user[0]._id) {
@@ -99,7 +134,7 @@ export default ({route, navigation}) => {
           api.delete(`deletePostPessoal/${item.id}`)
             .then((response) => {
               setCarregando(false)
-              console.log('comentarios post pessoal', state.comentariosPostPessoal)
+              //console.log('comentarios post pessoal', state.comentariosPostPessoal)
               setIsVisible(false),
                 dispatch({
                   type: 'deletePostPessoal',
@@ -117,6 +152,44 @@ export default ({route, navigation}) => {
         text: 'Não'
       }
     ])
+  }
+
+  function Like(item){
+    if (item.liked) {
+      api.put('postpessoalupdate/likeremove/'+item.id+'/'+userLogado)
+      .then((response) => {
+        console.log('like adicionado no banco', response.data);
+        dispatch({
+          type: 'updatePostPessoal',
+          payload: response.data,
+        })
+      })
+      .catch((err) => {
+        console.warn('Ocorreu um erro ao adicionar o like', err)
+      })
+    
+    }else{
+
+      api.put('postpessoalupdate/likeadd/'+item.id+'/'+userLogado)
+      .then((response) => {
+        console.log('like adicionado no banco', response.data);
+        dispatch({
+          type: 'updatePostPessoal',
+          payload: response.data,
+        })
+      })
+      .catch((err) => {
+        console.warn('Ocorreu um erro ao adicionar o like', err)
+      })
+    }
+  }
+
+  function verificaLike(item){
+    if (liked) {
+      //removeLike(item);
+    }else{
+      //addLike(item)
+    }
   }
 
   const CardHeader = ({ item }) => {
@@ -179,7 +252,7 @@ export default ({route, navigation}) => {
                 color='blue'
               /> 
               
-              <Text> {item.likes}</Text>
+              <Text> {item.likes != null ? item.likes.length : 0}</Text>
               </View>   
               <View style={{
                 marginTop: 10,
@@ -216,17 +289,15 @@ export default ({route, navigation}) => {
               marginTop: 10,
               alignItems: 'flex-start',
               flexDirection: 'row',
-             
-              
-              
+                          
             }}>
-              
+              {console.log('curtido>=???',item.liked )}
               <FontAwesome
                   name="thumbs-o-up"
                   size={20}
-                  color='black'
+                  color={item.liked ? 'blue' : 'black' }
                 />
-              <TouchableOpacity>      
+              <TouchableOpacity onPress={() => Like(item)}>      
               <Text>  Curtir</Text>
               </TouchableOpacity> 
             </View>  
@@ -234,9 +305,7 @@ export default ({route, navigation}) => {
             <View style={{
               marginTop: 10,
               alignItems: 'flex-end',
-              flexDirection: 'row',
-              
-              
+              flexDirection: 'row',           
               
             }}> 
               
@@ -275,6 +344,7 @@ export default ({route, navigation}) => {
  
 
   return (
+    console.log('items pessoais', state.postPessoal[0]),
     <FlatList
       keyExtractor={({ id }, index) => id}
       data={state.postPessoal}

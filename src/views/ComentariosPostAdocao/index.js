@@ -80,7 +80,8 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
                 })
                 console.warn('Novo Comentarios', response.data);
                 Alert.alert('Sucesso!','Comentário adicionado');
-                comentarios.concat(response.data) 
+                setComentario(''); 
+
             
         }, (error) => {
             console.warn('Erro', error);
@@ -103,7 +104,7 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
                     icon={<Icon name='edit' size={25} color="orange" />}
                 />
                 <Button
-                    onPress={() => confirmUserDeletion(item)}
+                    onPress={() => confirmComentarioDeletion(item)}
                     type="clear"
                     icon={<Icon name='delete' size={25} color="red" />}
                 />
@@ -111,6 +112,52 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
         )
     }
 
+    const usuarioLogar = () => {    
+        Alert.alert('Necessário logar','É necessário estar logado para comentar. Deseja efetuar o login ou criar uma conta?',
+            [
+                {
+                    text: 'Sim',
+                    onPress(){
+                        navigation.navigate('PerfilEntrar')
+                    }                   
+                },
+                {
+                    text: 'Não'
+                }
+            ]
+        )
+    }
+    
+    function confirmComentarioDeletion(item){
+        Alert.alert('Escluir Comentário','Deseja escluir o comentario?',[
+            {
+                text: 'Sim',
+                onPress(){
+                     
+                     api.delete(`deleteComentarioAdocao/${item.id}`)
+                     .then((response) => {
+                         setCarregando(false)
+                         console.log('comentarios post adocao',state.comentariosPostAdocao)
+
+                         dispatch({
+                            type: 'deleteComentarioPostAdocao',
+                            payload: item,
+                        }),
+                        Alert.alert('Sucesso!','Comentário deletado');  
+                     })
+                     .catch((err) => {
+                       console.warn("ops! ocorreu um erro" + err);
+                       console.log('items',response.data)
+                     });
+
+                       
+                }
+            },
+            {
+                text: 'Não'
+            }
+        ])
+    }
     const getComentarioItem = ({ item }) => {
         return (
             <View style={styles.containerMensagem}>
@@ -199,9 +246,19 @@ const ComentariosPostAdocao = ({ route, navigation }) => {
                         <Icon
                             name="send" color='white'
                             style={[styles.inputIcon, styles.inputIconSend]}
-                            onPress={() => {if (comentario.length <= 0) {
-                                Alert.alert('Erro','Náo possível adicioanr comentario em branco')
-                            }else{salvarComentario()}}}
+                            value={comentario}
+                            onPress={() => {if(state.user.length > 0){ if (comentario.length <= 0) {
+                                Alert.alert('Erro','Náo possível adicionar comentario em branco')
+                            }else{
+                                salvarComentario()
+                            }
+                        }else{
+                            usuarioLogar();
+                        }   
+                
+                    }
+                    
+                    }
                         />
                     </View>
                 </>

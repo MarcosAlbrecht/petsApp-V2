@@ -73,7 +73,7 @@ const ComentariosPostPessoal = ({route, navigation}) => {
                 })
                 console.log('Novo Comentarios', response.data);
                 //console.log('todos comentarios do state', state.comentariosPostPessoal);
-                setComentario('');
+                setComentario("");
                 Alert.alert('Sucesso!','Comentário adicionado'); 
             
         }, (error) => {
@@ -106,7 +106,7 @@ const ComentariosPostPessoal = ({route, navigation}) => {
     }
 
     function confirmComentarioDeletion(item){
-        Alert.alert('Escluir Usuário','Deseja escluir o usuario?',[
+        Alert.alert('Escluir comentário','Deseja escluir o comentário?',[
             {
                 text: 'Sim',
                 onPress(){
@@ -136,11 +136,27 @@ const ComentariosPostPessoal = ({route, navigation}) => {
         ])
     }
 
+    const usuarioLogar = () => {    
+            Alert.alert('Necessário logar','É necessário estar logado para comentar. Deseja efetuar o login ou criar uma conta?',
+                [
+                    {
+                        text: 'Sim',
+                        onPress(){
+                            navigation.navigate('PerfilEntrar')
+                        }                   
+                    },
+                    {
+                        text: 'Não'
+                    }
+                ]
+            )
+    }
+
     const getComentarioItem = ({ item }) => {
         return (
             <View style={styles.containerMensagem}>
                 <View>
-                    {console.log('items no corpo',item)}
+                    {console.log('items no corpo',item.usuario)}
                     <ListItem bottomDivider key={item.id}>
                         <Avatar
                             source={{ uri: item.usuario.foto }}
@@ -225,9 +241,19 @@ const ComentariosPostPessoal = ({route, navigation}) => {
                     <Icon
                         name="send" color='white'
                         style={[styles.inputIcon, styles.inputIconSend]}
-                        onPress={() => {if (comentario.length <= 0) {
-                            Alert.alert('Erro','Náo possível adicioanr comentario em branco')
-                          }else{salvarComentario()}}}
+                        value={comentario}
+                        onPress={() => {if(state.user.length > 0){ if (comentario.length <= 0) {
+                                    Alert.alert('Erro','Náo possível adicionar comentario em branco')
+                                }else{
+                                    salvarComentario()
+                                }
+                            }else{
+                                usuarioLogar();
+                            }   
+                    
+                        }
+                        
+                        }
                     />
                 </View>
                 </>

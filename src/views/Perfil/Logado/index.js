@@ -18,8 +18,8 @@ const Logado = ({ route, navigation }) => {
     useEffect(() => {
         if (state.user.length <= 0) {
             navigation.navigate('PerfilEntrar', {
-                "value": item,
-                "editanto": true
+                "value": "",
+                "editanto": false
             })
         }
 

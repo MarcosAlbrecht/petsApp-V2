@@ -89,7 +89,20 @@ function AdocaoTabStack(){
                     title: "Editar Comentário"
                 }}
             /> 
-            
+            <StackAdocao.Screen 
+                name='PerfilEntrar'
+                component={PerfilEntrar}
+                options={{
+                    title: "Entrar"              
+                }}
+            />  
+            <StackAdocao.Screen 
+                name='PerfilCadastrar'
+                component={PerfilCadastrar}
+                options={{
+                    title: "Cadastrar"
+                }}
+            />  
 
             
         </StackAdocao.Navigator>
@@ -142,7 +155,21 @@ function BlogTabStack(){
                 options={{
                     title: "Cadastro/Edição Post Pessoal"
                 }}
-            />   
+            />
+            <StackAdocao.Screen 
+                name='PerfilEntrar'
+                component={PerfilEntrar}
+                options={{
+                    title: "Entrar"              
+                }}
+            />  
+            <StackAdocao.Screen 
+                name='PerfilCadastrar'
+                component={PerfilCadastrar}
+                options={{
+                    title: "Cadastrar"
+                }}
+            />     
         </StackAdocao.Navigator>
     )
 }

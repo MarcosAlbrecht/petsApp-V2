@@ -158,31 +158,64 @@ const Cadastrar = ({ route, navigation }) => {
     }
 
     const salvarUsuario = () => {
-      
-      api.post('endereco/create', endereco)
-      .then((response) => {
-        let userAux;
-        userAux = user;
-        userAux.endereco.id = response.data.id;
-        setUser(userAux);
+      console.log('editando?', route.params.editando);
+      if (route.params.editando) {
+        console.log('editando user');  
+        api.put('enderecoupdate', endereco)
+        .then((response) => {
+          let userAux;
+          userAux = user;
+          userAux.endereco.id = response.data.id;
+          setUser(userAux);
 
-        console.log('valores do user', response.data);
+          console.log('valores do user', response.data);
 
-        api.post('users/create', user)
-        .then((retorno) => {
-          dispatch({
-            type: 'createUser',
-            payload: retorno.data,
-          })
-          AsyncStorage.setItem("TOKEN", retorno.data.id)  
-          }).catch((err) => {
-            console.log('Ocorreu um erro ao salvar usuario', err)
-          })
+          api.put('usersupdate/'+user.id, user)
+          .then((retorno) => {
+            dispatch({
+              type: 'updateUser',
+              payload: retorno.data,
+            })
+            AsyncStorage.setItem("TOKEN", retorno.data.id)  
+            }).catch((err) => {
+              console.log('Ocorreu um erro ao salvar usuario', err)
+            });
+            Alert.alert('Editado','Usuário editado com sucesso!')
+            
+
+        }).then((err) => {
+          console.warn('ocorreu um erro ao inserir endereco', err);
+          
+        });  
+        
+      }else{
+
+        api.post('endereco/create', endereco)
+        .then((response) => {
+          let userAux;
+          userAux = user;
+          userAux.endereco.id = response.data.id;
+          setUser(userAux);
+
+          console.log('valores do user', response.data);
+
+          api.post('users/create', user)
+          .then((retorno) => {
+            dispatch({
+              type: 'createUser',
+              payload: retorno.data,
+            })
+            AsyncStorage.setItem("TOKEN", retorno.data.id)  
+            }).catch((err) => {
+              console.log('Ocorreu um erro ao salvar usuario', err)
+            })
 
 
-      }).then((err) => {
-        console.warn('ocorreu um erro ao inserir endereco', err)
-      });
+        }).then((err) => {
+          console.warn('ocorreu um erro ao inserir endereco', err)
+        });
+
+      }
       
     }
 

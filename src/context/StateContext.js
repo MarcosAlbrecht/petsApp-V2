@@ -23,7 +23,7 @@ const actions = {
         const updated = action.payload
         return{
             ...state,
-            user: state.users.map(u => u.id === updated.id ? updated : u)
+            user: state.user.map(u => u.id === updated.id ? updated : u)
         }
     },
     deleteUser(state, action){
@@ -31,7 +31,14 @@ const actions = {
         console.warn(del)
         return {
             ...state,
-            user: state.user.filter(u => u.id !== del.id)
+            user: [],
+        }
+    },
+    cleanUser(state){
+        //const post = action.payload
+        return {
+            ...state,
+            user: [],
         }
     },
     createPostAdocao(state, action){

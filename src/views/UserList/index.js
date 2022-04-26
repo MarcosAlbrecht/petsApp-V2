@@ -132,7 +132,7 @@ export default ({route, navigation}) => {
         
 
         return (
-            console.warn('fotos',item.fotos[0]),
+            //console.warn('fotos',item.fotos[0]),
             /*console.warn(item.fotos),
             <ListItem bottomDivider key={item.id} onPress={() => props.navigation.navigate('PostAdocaoDetalhado',item) }> 
                 <Avatar source={ { uri: item.fotos[0] } } />
