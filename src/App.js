@@ -24,13 +24,23 @@ import PerfilCadastrar from './views/Perfil/Cadastrar';
 //const Stack = createStackNavigator();
 const StackAdocao = createStackNavigator();
 
+
+
 const Tab = createBottomTabNavigator();
 
+const DrawerNavigator = () => {
+    return (
+      <Drawer.Navigator>
+        <Drawer.Screen name="Home"  />
+        <Drawer.Screen name="Contact" />
+      </Drawer.Navigator>
+    );
+  }
 
 function AdocaoTabStack(){
     return(
         <StackAdocao.Navigator screenOptions={screenOptions}>
-        
+            
             <StackAdocao.Screen 
                 name="Adoção" 
                 component={UserList}
