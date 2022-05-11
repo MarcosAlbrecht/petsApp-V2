@@ -105,7 +105,7 @@ export default ({route, navigation}) => {
         
         setUserLogado(state.user[0]._id);
         console.log('ususario logado',  userLogado)
-      }else console.log('ususario nao logado', state.user[0]._id)
+      }else console.log('ususario nao logado')
   }, []); 
 
   function renderButtonMore(item){
@@ -155,32 +155,37 @@ export default ({route, navigation}) => {
   }
 
   function Like(item){
-    if (item.liked) {
-      api.put('postpessoalupdate/likeremove/'+item.id+'/'+userLogado)
-      .then((response) => {
-        console.log('like adicionado no banco', response.data);
-        dispatch({
-          type: 'updatePostPessoal',
-          payload: response.data,
+    //verifica usuario esta logado para registrar o like
+    if (state.user.length > 0) {  
+      if (item.liked) {
+        api.put('postpessoalupdate/likeremove/'+item.id+'/'+userLogado)
+        .then((response) => {
+          console.log('like adicionado no banco', response.data);
+          dispatch({
+            type: 'updatePostPessoal',
+            payload: response.data,
+          })
         })
-      })
-      .catch((err) => {
-        console.warn('Ocorreu um erro ao adicionar o like', err)
-      })
-    
-    }else{
+        .catch((err) => {
+          console.warn('Ocorreu um erro ao adicionar o like', err)
+        })
+      
+      }else{
 
-      api.put('postpessoalupdate/likeadd/'+item.id+'/'+userLogado)
-      .then((response) => {
-        console.log('like adicionado no banco', response.data);
-        dispatch({
-          type: 'updatePostPessoal',
-          payload: response.data,
+        api.put('postpessoalupdate/likeadd/'+item.id+'/'+userLogado)
+        .then((response) => {
+          console.log('like adicionado no banco', response.data);
+          dispatch({
+            type: 'updatePostPessoal',
+            payload: response.data,
+          })
         })
-      })
-      .catch((err) => {
-        console.warn('Ocorreu um erro ao adicionar o like', err)
-      })
+        .catch((err) => {
+          console.warn('Ocorreu um erro ao adicionar o like', err)
+        })
+      }
+    }else{
+      Alert.alert('Efetuar Login','É necessário logar para curtir o post!')
     }
   }
 

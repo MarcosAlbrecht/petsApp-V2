@@ -57,11 +57,18 @@ const actions = {
     },
     deletePostAdocao(state, action){
         const post = action.payload
-        console.warn(post)
+        console.log(post)
         return {
             ...state,
             postAdocao: state.postAdocao.filter(u => u.id !== post.id)
         }
+    },
+    aplicaFiltroAdocao(state, action){
+        const post = action.payload
+        return {
+            ...state,
+            postAdocao: post
+        }    
     },
 
     createPostPessoal(state, action){

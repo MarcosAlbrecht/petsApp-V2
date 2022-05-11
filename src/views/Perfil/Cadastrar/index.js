@@ -160,7 +160,15 @@ const Cadastrar = ({ route, navigation }) => {
     const salvarUsuario = () => {
       console.log('editando?', route.params.editando);
       if (route.params.editando) {
-        console.log('editando user');  
+        let enderecoId;
+        enderecoId = user.endereco.id;
+        let aux;
+        aux = endereco;
+        endereco.id = enderecoId
+        //setEndereco({...endereco, id: enderecoId}) ;
+        setEndereco(aux);
+        //setcadastroPostAdocao({...cadastroPostAdocao, usuario: { id : response.data.id }});
+        console.log('editando endereco', endereco); 
         api.put('enderecoupdate', endereco)
         .then((response) => {
           let userAux;

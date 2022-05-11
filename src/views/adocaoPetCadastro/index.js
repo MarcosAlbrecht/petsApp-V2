@@ -300,7 +300,7 @@ export default ({ route, navigation }) => {
 
     }else{
       //setcadastroPostAdocao({...cadastroPostAdocao.usuario, usuario: { id : idUser }})
-      cadastroPostAdocao.fotos.splice(0,1)
+      //cadastroPostAdocao.fotos.splice(0,1)
       console.warn('cadastrando dados', cadastroPostAdocao)
       api.post("postadocao/create", cadastroPostAdocao)
         .then((response) => {
@@ -327,6 +327,8 @@ export default ({ route, navigation }) => {
         console.log('entrou nop token');
 
       })
+    }else{
+      setcadastroPostAdocao({...cadastroPostAdocao, usuario: { id : state.user[0]._id }});
     }
     buscarRacas();
     console.log('valor inicial do postadocao', cadastroPostAdocao);

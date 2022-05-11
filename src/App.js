@@ -20,6 +20,7 @@ import postPessoal from './views/postPessoal';
 import PerfilLogado from './views/Perfil/Logado';
 import PerfilEntrar from './views/Perfil/Entrar';
 import PerfilCadastrar from './views/Perfil/Cadastrar';
+import Filtro from './views/filtro'
 
 //const Stack = createStackNavigator();
 const StackAdocao = createStackNavigator();
@@ -28,14 +29,6 @@ const StackAdocao = createStackNavigator();
 
 const Tab = createBottomTabNavigator();
 
-const DrawerNavigator = () => {
-    return (
-      <Drawer.Navigator>
-        <Drawer.Screen name="Home"  />
-        <Drawer.Screen name="Contact" />
-      </Drawer.Navigator>
-    );
-  }
 
 function AdocaoTabStack(){
     return(
@@ -50,7 +43,7 @@ function AdocaoTabStack(){
                     headerRight: () => (
                         <View style={{flexDirection: 'row'}}>
                         <Button
-                            onPress={() => {}} 
+                            onPress={() => navigation.navigate("Filtro")} 
                             type='clear'
                             icon={<IconFeather name="filter" size={25} color="white"/>}
                         />
@@ -113,6 +106,13 @@ function AdocaoTabStack(){
                     title: "Cadastrar"
                 }}
             />  
+            <StackAdocao.Screen 
+                name='Filtro'
+                component={Filtro}
+                options={{
+                    title: "Filtro"
+                }}
+            />  
 
             
         </StackAdocao.Navigator>
@@ -130,11 +130,7 @@ function BlogTabStack(){
                         title:"Posts",
                         headerRight: () => (
                             <View style={{flexDirection: 'row'}}>
-                            <Button
-                                onPress={() => {}} 
-                                type='clear'
-                                icon={<IconFeather name="filter" size={25} color="white"/>}
-                            />
+                            
                             <Button
                                 onPress={() => navigation.navigate("postPessoal")} 
                                 type='clear'

@@ -1,6 +1,6 @@
 import { getActionFromState } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, FlatList, Alert, TouchableOpacity, Image, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, Alert, TouchableOpacity, Image, ActivityIndicator, Modal } from 'react-native';
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements';
 import UsersContext from '../../context/StateContext';
 import api from '../../services/api';
@@ -14,6 +14,7 @@ export default ({route, navigation}) => {
     const [postAdocao, setPostAdocao] = useState(route.params ? route.params : {});
     const [carregando, setCarregando] = useState(true);
     const {state, dispatch} = useContext(UsersContext);
+    const [modal, setModal] = useState(false);
     //const {state} = useContext(UsersContext);
     //console.warn('ctx', Object.keys(ctx.state))   
     useEffect(() => {
@@ -188,6 +189,8 @@ export default ({route, navigation}) => {
                         </View>           
                     </View>
                 </View>
+
+                
             </View>
         )
     }
