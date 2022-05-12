@@ -65,9 +65,20 @@ const actions = {
     },
     aplicaFiltroAdocao(state, action){
         const post = action.payload
+        
         return {
             ...state,
             postAdocao: post
+            
+        }    
+    },
+    limparStateAdocao(state, action){
+        const post = action.payload
+        
+        return {
+            state,
+            postAdocao: []
+            
         }    
     },
 
@@ -93,6 +104,15 @@ const actions = {
             postPessoal: state.postPessoal.filter(u => u.id !== post.id)
         }
     },
+    limparStatePessoal(state, action){
+        const post = action.payload 
+        return {
+            ...state,
+            postPessoal: []
+            
+        }   
+    },
+    
     createComentarioPostPessoal(state, action){
         const post = action.payload
         //let auxComents = initialState;

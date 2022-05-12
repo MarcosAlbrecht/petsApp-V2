@@ -7,9 +7,9 @@ import { Picker } from "@react-native-picker/picker";
 // import { Container } from './styles';
 
 const Filtro = ({ route, navigation }) => {
-    const [filtro, setFiltro] = useState(route.params ? route.params : {porte:0});
+    const [filtro, setFiltro] = useState(route.params ? route.params : {porte:""});
     const {state, dispatch} = useContext(UsersContext);
-    const [porte1, setPorte1] = useState(['Porte','Pequeno', 'Médio', 'Grande','Gigante']);
+    const [porte, setPorte] = useState(['Porte','Pequeno', 'Médio', 'Grande','Gigante']);
     const [nomePorte, setNomePorte] = useState();
     const limpar = () => {
         setFiltro({...filtro, porte: 0})  
@@ -17,23 +17,29 @@ const Filtro = ({ route, navigation }) => {
 
     function aplicarFiltro() {
         let aux = state.postAdocao;
-        if (filtro.porte > 0) {
-            console.log('Filtro aplicado', state.postAdocao[0].porte); 
-            aux = aux.filter(data => data.porte == nomePorte);
-            console.log('Filtro aplicado', aux);   
+        if (filtro.porte != null) {
+            console.log('Filtro aplicado porte', state.postAdocao.length); 
+            console.log('Filtro aplicado porte nome', filtro.porte);
+            aux = aux.filter(data => data.porte == filtro.porte);
+            console.log('Filtro aplicado porte', aux.length);   
         }
-        if (filtro.ddd != null) {
+        else if (filtro.ddd != null) {
             console.log('Filtro DDD', state.postAdocao[0].ddd); 
             aux = aux.filter(data => data.usuario.ddd == filtro.ddd);
             console.log('Filtro DDD aplicado', aux);    
             
         }
-         
+        dispatch({
+            type: 'limparStateAdocao',
+            payload: aux,
+        });
+        
         dispatch({
             type: 'aplicaFiltroAdocao',
             payload: aux,
         });
         navigation.goBack();
+        console.log('tamanho state adocao apos filtro',state.postAdocao.length);
     }   
     return (    
 
@@ -59,18 +65,14 @@ const Filtro = ({ route, navigation }) => {
                 </View>
                 {console.log(filtro)}
                 <Picker style={styles.textInput} selectedValue={filtro.porte}
-                    onValueChange={(porteName, porte) => setFiltro({...filtro, porte})}
-                    placeholder="Porte"
-                    >
+                    onValueChange={(porte, itemIndex) => setFiltro({...filtro, porte})}>
                     {
-                        //console.log('selecionado', filtro.porte),
-                        porte1.filter((value, index) => filtro.porte === 0 ? value : index === 0 ? false : true)
-                        .map((cr, key) => {
-                        return <Picker.Item label={cr} value={key} />
+                        porte.map((cr, key) => {
+                        return <Picker.Item label={cr} value={cr} />
                         })
                     }
 
-                    </Picker>
+                </Picker>
 
 
 

@@ -71,6 +71,16 @@ const ComentariosPostPessoal = ({route, navigation}) => {
                     type: 'addComentarioPostPessoal',
                     payload: response.data,
                 })
+                let aux;
+                aux = postPessoal
+                postPessoal.comentariosPessoal += 1;
+                setpostPessoal(aux);
+                dispatch({
+                    
+                    type: 'updatePostPessoal',
+                    payload: postPessoal,
+                })
+
                 console.log('Novo Comentarios', response.data);
                 //console.log('todos comentarios do state', state.comentariosPostPessoal);
                 setComentario("");
@@ -119,14 +129,23 @@ const ComentariosPostPessoal = ({route, navigation}) => {
                          dispatch({
                             type: 'deleteComentarioPostPessoal',
                             payload: item,
-                        }),
+                        });
+                        let aux;
+                        aux = postPessoal
+                        postPessoal.comentariosPessoal -= 1;
+                        setpostPessoal(aux);
+                        dispatch({
+                            
+                            type: 'updatePostPessoal',
+                            payload: postPessoal,
+                        });
                         Alert.alert('Sucesso!','Comentário deletado');  
                      })
                      .catch((err) => {
                        console.warn("ops! ocorreu um erro" + err);
                        console.log('items',response.data)
                      });
-
+                     	    
                        
                 }
             },

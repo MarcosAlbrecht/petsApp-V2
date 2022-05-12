@@ -18,6 +18,7 @@ export default ({route, navigation}) => {
   const [itemm, setItemm] = useState();
   const [liked, setLiked] = useState(false);
   const [userLogado, setUserLogado] = useState();
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const options = {
     headers: {
           "Accept": 'application/json',
@@ -153,6 +154,45 @@ export default ({route, navigation}) => {
       }
     ])
   }
+
+  const onRefresh = () => {
+    //set isRefreshing to true
+    
+    setIsRefreshing(true);
+    
+    dispatch({
+        type: 'limparStatePessoal'    
+    });
+    api.get("postpessoal", options)
+      //.then((response) => {setPostAdocao(response.data), console.warn('dados',item.fotos[0])})
+      .then((response) => {
+          response.data.forEach(element => {
+            console.log('tamanho refresh',response.data.length)
+            if (state.user.length > 0) {
+              console.log('executando funcao verificalike',verificarLike(element.likes))
+              if (verificarLike(element.likes)){
+                //console.log('entrou no if dos likes ',element.likes.length)
+                element.liked = true
+              }
+            }
+            
+            dispatch({
+                type: 'createPostPessoal',
+                payload: element,
+            });
+            console.log('likeds? ',element.likes)
+          }),
+          setCarregando(false);
+          //console.log('items',response.data)
+          
+      })
+      .catch((err) => {
+        console.warn("ops! ocorreu um erro ao atualizar postPessoal" + err);
+        //console.log('items',status.postPessoal)
+      });
+
+    setIsRefreshing(false);
+}
 
   function Like(item){
     //verifica usuario esta logado para registrar o like
@@ -346,16 +386,20 @@ export default ({route, navigation}) => {
 
       </View>
   )};
+
+  
  
 
   return (
-    console.log('items pessoais', state.postPessoal[0]),
+    //console.log('items pessoais', state.postPessoal[0]),
     <FlatList
       keyExtractor={({ id }, index) => id}
       data={state.postPessoal}
       //renderItem={getUserItem}
       renderItem={RenderPosts}
       extraData={state.postPessoal}
+      onRefresh={onRefresh}
+      refreshing={isRefreshing}
     //<Text key={item._id}>{item.nome},{item.idade}</Text>
 
     />

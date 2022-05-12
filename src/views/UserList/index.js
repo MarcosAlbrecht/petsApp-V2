@@ -1,6 +1,6 @@
 import { getActionFromState } from '@react-navigation/native';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text, FlatList, Alert, TouchableOpacity, Image, ActivityIndicator, Modal } from 'react-native';
+import { View, Text, FlatList, Alert, TouchableOpacity, Image, ActivityIndicator, Modal, RefreshControl } from 'react-native';
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements';
 import UsersContext from '../../context/StateContext';
 import api from '../../services/api';
@@ -15,6 +15,7 @@ export default ({route, navigation}) => {
     const [carregando, setCarregando] = useState(true);
     const {state, dispatch} = useContext(UsersContext);
     const [modal, setModal] = useState(false);
+    const [isRefreshing, setIsRefreshing] = useState(false)
     //const {state} = useContext(UsersContext);
     //console.warn('ctx', Object.keys(ctx.state))   
     useEffect(() => {
@@ -129,6 +130,33 @@ export default ({route, navigation}) => {
         )
     }
 
+    const onRefresh = () => {
+        //set isRefreshing to true
+        
+        setIsRefreshing(true);
+        dispatch({
+            type: 'limparStateAdocao',
+            
+        });
+        api.get("postadocao")
+          //.then((response) => {setPostAdocao(response.data), console.warn('dados',item.fotos[0])})
+          .then((response) => {
+              response.data.forEach(element => {
+                dispatch({
+                    type: 'createPostAdocao',
+                    payload: element,
+                })
+              })
+              
+          })
+          .catch((err) => {
+            console.warn("ops! ocorreu um erro" + err);
+            console.log('items',response.data)
+          });
+
+        setIsRefreshing(false);
+    }
+
     const getUserItem =({ item }) => {
         
 
@@ -209,7 +237,9 @@ export default ({route, navigation}) => {
                     data={state.postAdocao}
                     //renderItem={getUserItem}
                     renderItem={getUserItem}
-                    extraData={state.postAdocao}    
+                    extraData={state.postAdocao} 
+                    onRefresh={onRefresh}
+                    refreshing={isRefreshing}   
                     //<Text key={item._id}>{item.nome},{item.idade}</Text>
                     
                 />
